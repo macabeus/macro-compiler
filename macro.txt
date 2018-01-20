@@ -1,6 +1,7 @@
 macro Hello {
   do ola
   log foo bar baz
+  call help "my parameter" "another"
 }
 
 macro help {
