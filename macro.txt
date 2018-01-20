@@ -1,7 +1,6 @@
 macro Hello {
   do ola
-  do castilho
-  do tchau
+  log foo bar baz
 }
 
 macro help {
