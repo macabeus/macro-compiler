@@ -1,0 +1,9 @@
+macro Hello {
+  do ola
+  do castilho
+  do tchau
+}
+
+macro help {
+  do ajuda
+}
