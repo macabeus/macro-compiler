@@ -7,15 +7,15 @@ defmodule MacroCompiler.MacroBlock do
 
   def parser() do
     many(
-      sequence([
-        skip(spaces()),
+      between(
+        spaces(),
         choice([
           DoExpression.parser(),
           LogExpression.parser(),
           CallExpression.parser()
         ]),
         skip(newline())
-      ])
+      )
     )
   end
 end
