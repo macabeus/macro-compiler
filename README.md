@@ -5,17 +5,17 @@
   </a>
 </p>
 
->Best way to create macro.
+>The best way to create macros.
 
-MacroCompiler is a compiler from the awesome [EventMacro](http://openkore.com/index.php/EventMacro) to [OpenKore](https://github.com/OpenKore/openkore/) plugin (that is, Perl).
+MacroCompiler compiles from the awesome [EventMacro](http://openkore.com/index.php/EventMacro) to [OpenKore](https://github.com/OpenKore/openkore/) plugin (that is, Perl).
 
-This project aim to offer a faster, more secure and more flexible alternative to run macros on OpenKore.
+This project aims to offer a faster, more secure and more flexible alternative to run macros on OpenKore.
 
-**Faster** because the OpenKore doesn't need interprete a Macro code to then run Perl code. Now it run Perl code directly.
-**More secure** because the compiler show errors, then you can fix it before run the bot.
-**More flexible** because is more easy add new feature in a compiler than a regex-based interpreter.
+**Faster** because the OpenKore doesn't need to interpret a Macro code to then run Perl code. Now it runs Perl code directly.
+**More secure** because the compiler shows errors, then you can fix them before running the bot.
+**More flexible** because it's easier to add new features in a compiler than a regex-based interpreter.
 
->Hey! Warning: This project is under in construction, then it's incomplete and only have a tiny subset of EventMacro commands.
+>Hey! Warning: This project is under construction, then it's incomplete and it only has a tiny subset of EventMacro commands.
 
 # Example
 
@@ -54,13 +54,13 @@ Commands::run("c hello to everyone!");
 }
 ```
 
-Then you will can use this plugin.
+Then you could use this plugin.
 
 # How to run
 
-You must have Elixir in your computer. [Read here how to install it](https://elixir-lang.org/install.html).
+You must have Elixir in your computer. [You could read here how to install it](https://elixir-lang.org/install.html).
 
-To compiler your macro, run this command:
+To compile your macro, you need to run this command:
 
 ```
 mix run lib/macrocompiler.ex path/of/eventMacro.txt > macro.pl
