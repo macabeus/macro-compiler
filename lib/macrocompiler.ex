@@ -3,6 +3,8 @@ defmodule MacroCompiler do
   alias MacroCompiler.TopLevelBlock
   alias MacroCompiler.SymbolsTable
   alias MacroCompiler.SemanticAnalysis
+  alias MacroCompiler.CodeGeneration
+  alias MacroCompiler.CodeGenerationHeader
 
   def start_parser() do
     [ast] = Combine.parse_file("macro.txt", TopLevelBlock.parser())
@@ -11,8 +13,9 @@ defmodule MacroCompiler do
 
     SemanticAnalysis.validate(ast, ast, table)
 
-    ast
+    CodeGenerationHeader.generate(ast, ast, table)
+    CodeGeneration.generate(ast, ast, table)
   end
 end
 
-IO.inspect MacroCompiler.start_parser()
+MacroCompiler.start_parser()
