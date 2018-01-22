@@ -18,7 +18,12 @@ defmodule MacroCompiler.CodeGeneration do
   end
 
   def generate(%CallExpression{macro: macro, params: params}, _ast, _symbolsTable) do
-    IO.puts "&macro_#{macro};"
+    params =
+      params
+      |> Enum.map(&("\"#{&1}\""))
+      |> Enum.join(",")
+
+    IO.puts "&macro_#{macro}(#{params});"
   end
 
   def generate(%DoExpression{action: action}, _ast, _symbolsTable) do
