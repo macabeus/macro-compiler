@@ -4,6 +4,7 @@ defmodule MacroCompiler.MacroBlock do
   alias MacroCompiler.DoExpression
   alias MacroCompiler.LogExpression
   alias MacroCompiler.CallExpression
+  alias MacroCompiler.ScalarVariableAssignment
 
   def parser() do
     many(
@@ -12,7 +13,8 @@ defmodule MacroCompiler.MacroBlock do
         choice([
           DoExpression.parser(),
           LogExpression.parser(),
-          CallExpression.parser()
+          CallExpression.parser(),
+          ScalarVariableAssignment.parser()
         ]),
         skip(newline())
       )
