@@ -32,7 +32,7 @@ defmodule MacroCompiler.CallExpression do
 
         skip(char(?\n))
       ]),
-      fn [macro] -> %MacroCompiler.CallExpression{macro: macro, params: nil};
+      fn [macro] -> %MacroCompiler.CallExpression{macro: macro, params: []};
          [macro, params] -> %MacroCompiler.CallExpression{macro: macro, params: params |> Enum.map(&List.to_string/1)} end
     )
   end
