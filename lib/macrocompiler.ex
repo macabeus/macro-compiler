@@ -6,8 +6,8 @@ defmodule MacroCompiler do
   alias MacroCompiler.CodeGeneration
   alias MacroCompiler.CodeGenerationHeader
 
-  def start_parser() do
-    [ast] = Combine.parse_file("macro.txt", TopLevelBlock.parser())
+  def start_parser(macro_file) do
+    [ast] = Combine.parse_file(macro_file, TopLevelBlock.parser())
 
     table = SymbolsTable.build(ast)
 
@@ -18,4 +18,8 @@ defmodule MacroCompiler do
   end
 end
 
-MacroCompiler.start_parser()
+
+case System.argv do
+  [] -> MacroCompiler.start_parser("macro.txt")
+  [macro_file] -> MacroCompiler.start_parser(macro_file)
+end
