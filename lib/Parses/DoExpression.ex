@@ -11,9 +11,9 @@ defmodule MacroCompiler.DoExpression do
         ignore(string("do")),
         skip(space()),
 
-        option(word())
+        take_while(fn ?\n -> false; _ -> true end)
       ]),
-      fn [action] -> %MacroCompiler.DoExpression{action: action} end
+      fn [action] -> %MacroCompiler.DoExpression{action: action |> List.to_string} end
     )
   end
 end
