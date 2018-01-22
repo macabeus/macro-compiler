@@ -3,6 +3,7 @@ defmodule MacroCompiler.CodeGeneration do
   alias MacroCompiler.CallExpression
   alias MacroCompiler.DoExpression
   alias MacroCompiler.LogExpression
+  alias MacroCompiler.UndefScalarVariable
   alias MacroCompiler.ScalarVariableAssignment
 
   def generate(block, ast, symbolsTable) when is_list(block) do
@@ -37,6 +38,10 @@ defmodule MacroCompiler.CodeGeneration do
 
   def generate(%ScalarVariableAssignment{name: name, value: value}, _ast, _symbolsTable) do
     IO.puts "$#{name} = \"#{value}\";"
+  end
+
+  def generate(%UndefScalarVariable{name: name}, _ast, _symbolsTable) do
+    IO.puts "undef $#{name};"
   end
 
   def generate(_undefinedNode, _ast, _symbolsTable) do

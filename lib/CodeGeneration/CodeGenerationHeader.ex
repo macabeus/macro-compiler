@@ -2,6 +2,7 @@ defmodule MacroCompiler.CodeGenerationHeader do
   alias MacroCompiler.Macro
   alias MacroCompiler.DoExpression
   alias MacroCompiler.LogExpression
+  alias MacroCompiler.UndefScalarVariable
   alias MacroCompiler.ScalarVariableAssignment
 
   def generate(node, ast, symbolsTable) do
@@ -42,6 +43,10 @@ defmodule MacroCompiler.CodeGenerationHeader do
   end
 
   defp find_requirements(%ScalarVariableAssignment{name: name, value: _value}, _ast, _symbolsTable) do
+    %{variable: "$#{name}"}
+  end
+
+  defp find_requirements(%UndefScalarVariable{name: name}, _ast, _symbolsTable) do
     %{variable: "$#{name}"}
   end
 
