@@ -2,16 +2,20 @@ defmodule MacroCompiler.CodeGenerationHeader do
   alias MacroCompiler.Macro
   alias MacroCompiler.DoExpression
   alias MacroCompiler.LogExpression
+  alias MacroCompiler.ScalarVariableAssignment
 
   def generate(node, ast, symbolsTable) do
     IO.puts "package macroCompiled;"
 
-    find_modules(node, ast, symbolsTable)
+    find_requirements(node, ast, symbolsTable)
     |> List.flatten
     |> MapSet.new
     |> MapSet.delete(nil)
     |> Enum.map(&(
-      IO.puts "use #{&1};"
+      case &1 do
+        %{module: module_name} -> IO.puts "use #{module_name};"
+        %{variable: variable_name} -> IO.puts "my #{variable_name};"
+      end
     ))
 
     IO.puts """
@@ -21,23 +25,27 @@ defmodule MacroCompiler.CodeGenerationHeader do
   end
 
 
-  defp find_modules(block, ast, symbolsTable) when is_list(block) do
-    Enum.map(block, &(find_modules(&1, ast, symbolsTable)))
+  defp find_requirements(block, ast, symbolsTable) when is_list(block) do
+    Enum.map(block, &(find_requirements(&1, ast, symbolsTable)))
   end
 
-  defp find_modules(%Macro{name: _name, block: block}, ast, symbolsTable) do
-    find_modules(block, ast, symbolsTable)
+  defp find_requirements(%Macro{name: _name, block: block}, ast, symbolsTable) do
+    find_requirements(block, ast, symbolsTable)
   end
 
-  defp find_modules(%DoExpression{action: _action}, _ast, _symbolsTable) do
-    "Commands"
+  defp find_requirements(%DoExpression{action: _action}, _ast, _symbolsTable) do
+    %{module: "Commands"}
   end
 
-  defp find_modules(%LogExpression{message: _message}, _ast, _symbolsTable) do
-    "Log qw(message)"
+  defp find_requirements(%LogExpression{message: _message}, _ast, _symbolsTable) do
+    %{module: "Log qw(message)"}
   end
 
-  defp find_modules(_undefinedNode, _ast, _symbolsTable) do
+  defp find_requirements(%ScalarVariableAssignment{name: name, value: _value}, _ast, _symbolsTable) do
+    %{variable: "$#{name}"}
+  end
+
+  defp find_requirements(_undefinedNode, _ast, _symbolsTable) do
 
   end
 end

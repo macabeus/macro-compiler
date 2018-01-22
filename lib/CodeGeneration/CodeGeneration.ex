@@ -3,6 +3,7 @@ defmodule MacroCompiler.CodeGeneration do
   alias MacroCompiler.CallExpression
   alias MacroCompiler.DoExpression
   alias MacroCompiler.LogExpression
+  alias MacroCompiler.ScalarVariableAssignment
 
   def generate(block, ast, symbolsTable) when is_list(block) do
     Enum.map(block, &(generate(&1, ast, symbolsTable)))
@@ -32,6 +33,10 @@ defmodule MacroCompiler.CodeGeneration do
 
   def generate(%LogExpression{message: message}, _ast, _symbolsTable) do
     IO.puts "message \"#{message}\\n\";"
+  end
+
+  def generate(%ScalarVariableAssignment{name: name, value: value}, _ast, _symbolsTable) do
+    IO.puts "$#{name} = \"#{value}\";"
   end
 
   def generate(_undefinedNode, _ast, _symbolsTable) do
