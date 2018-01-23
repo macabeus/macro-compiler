@@ -1,6 +1,7 @@
 defmodule MacroCompiler.CallExpression do
   use Combine
   use Combine.Helpers
+  alias MacroCompiler.Identifier
 
   @enforce_keys [:macro, :params]
   defstruct [:macro, :params]
@@ -11,7 +12,7 @@ defmodule MacroCompiler.CallExpression do
         ignore(string("call")),
         ignore(spaces()),
 
-        word(),
+        Identifier.parser(),
 
         either(
           ignore(char(?\n)),

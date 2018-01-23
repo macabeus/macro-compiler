@@ -1,6 +1,7 @@
 defmodule MacroCompiler.UndefScalarVariable do
   use Combine
   use Combine.Helpers
+  alias MacroCompiler.Identifier
 
   @enforce_keys [:name]
   defstruct [:name]
@@ -9,7 +10,7 @@ defmodule MacroCompiler.UndefScalarVariable do
     map(
       sequence([
         ignore(string("$")),
-        word(),
+        Identifier.parser(),
 
         skip(spaces()),
         ignore(string("=")),

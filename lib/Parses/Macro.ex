@@ -2,6 +2,7 @@ defmodule MacroCompiler.Macro do
   use Combine
   use Combine.Helpers
   alias MacroCompiler.MacroBlock
+  alias MacroCompiler.Identifier
 
   @enforce_keys [:name, :block]
   defstruct [:name, :block]
@@ -12,7 +13,7 @@ defmodule MacroCompiler.Macro do
         ignore(string("macro")),
         ignore(spaces()),
 
-        word(),
+        Identifier.parser(),
 
         ignore(spaces()),
         ignore(char("{")),

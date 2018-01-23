@@ -1,6 +1,7 @@
 defmodule MacroCompiler.ScalarVariableAssignment do
   use Combine
   use Combine.Helpers
+  alias MacroCompiler.Identifier
 
   @enforce_keys [:name, :value]
   defstruct [:name, :value]
@@ -9,7 +10,7 @@ defmodule MacroCompiler.ScalarVariableAssignment do
     map(
       sequence([
         ignore(string("$")),
-        word(),
+        Identifier.parser(),
 
         skip(spaces()),
         ignore(string("=")),
