@@ -6,6 +6,7 @@ defmodule MacroCompiler.MacroBlock do
   alias MacroCompiler.CallExpression
   alias MacroCompiler.UndefScalarVariable
   alias MacroCompiler.ScalarVariableAssignment
+  alias MacroCompiler.PauseExpression
 
   def parser() do
     many(
@@ -16,7 +17,8 @@ defmodule MacroCompiler.MacroBlock do
           LogExpression.parser(),
           CallExpression.parser(),
           UndefScalarVariable.parser(),
-          ScalarVariableAssignment.parser()
+          ScalarVariableAssignment.parser(),
+          PauseExpression.parser()
         ]),
         skip(newline())
       )

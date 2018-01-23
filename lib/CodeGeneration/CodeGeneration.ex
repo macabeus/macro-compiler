@@ -5,6 +5,7 @@ defmodule MacroCompiler.CodeGeneration do
   alias MacroCompiler.LogExpression
   alias MacroCompiler.UndefScalarVariable
   alias MacroCompiler.ScalarVariableAssignment
+  alias MacroCompiler.PauseExpression
 
   def generate(block, ast, symbolsTable) when is_list(block) do
     Enum.map(block, &(generate(&1, ast, symbolsTable)))
@@ -42,6 +43,10 @@ defmodule MacroCompiler.CodeGeneration do
 
   def generate(%UndefScalarVariable{name: name}, _ast, _symbolsTable) do
     IO.puts "undef $#{name};"
+  end
+
+  def generate(%PauseExpression{seconds: seconds}, _ast, _symbolsTable) do
+    # TODO
   end
 
   def generate(_undefinedNode, _ast, _symbolsTable) do
