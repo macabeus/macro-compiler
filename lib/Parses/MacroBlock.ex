@@ -1,6 +1,9 @@
 defmodule MacroCompiler.MacroBlock do
   use Combine
   use Combine.Helpers
+
+  alias MacroCompiler.SyntaxError
+
   alias MacroCompiler.DoExpression
   alias MacroCompiler.LogExpression
   alias MacroCompiler.CallExpression
@@ -22,7 +25,9 @@ defmodule MacroCompiler.MacroBlock do
           ScalarVariableAssignment.parser(),
           ArrayVariableAssignment.parser(),
           HashVariableAssignment.parser(),
-          PauseExpression.parser()
+          PauseExpression.parser(),
+
+          SyntaxError.raiseAtPosition(),
         ]),
         skip(newline())
       )
