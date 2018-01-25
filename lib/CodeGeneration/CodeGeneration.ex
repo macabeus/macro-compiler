@@ -10,6 +10,8 @@ defmodule MacroCompiler.CodeGeneration do
   alias MacroCompiler.ScalarVariable
   alias MacroCompiler.ArrayVariable
   alias MacroCompiler.HashVariable
+  alias MacroCompiler.IncrementExpression
+  alias MacroCompiler.DecrementExpression
   alias MacroCompiler.PauseExpression
 
   def generate(block, ast, symbolsTable) when is_list(block) do
@@ -99,7 +101,19 @@ defmodule MacroCompiler.CodeGeneration do
     IO.puts ";"
   end
 
-  def generate(%PauseExpression{seconds: seconds}, _ast, _symbolsTable) do
+  def generate(%IncrementExpression{scalar_variable: scalar_variable}, ast, symbolsTable) do
+    generate(scalar_variable, ast, symbolsTable)
+
+    IO.puts "++;"
+  end
+
+  def generate(%DecrementExpression{scalar_variable: scalar_variable}, ast, symbolsTable) do
+    generate(scalar_variable, ast, symbolsTable)
+
+    IO.puts "--;"
+  end
+
+  def generate(%PauseExpression{seconds: _seconds}, _ast, _symbolsTable) do
     # TODO
   end
 

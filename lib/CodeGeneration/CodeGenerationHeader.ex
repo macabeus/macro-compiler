@@ -9,6 +9,8 @@ defmodule MacroCompiler.CodeGenerationHeader do
   alias MacroCompiler.ScalarVariable
   alias MacroCompiler.ArrayVariable
   alias MacroCompiler.HashVariable
+  alias MacroCompiler.IncrementExpression
+  alias MacroCompiler.DecrementExpression
 
   def generate(node, ast, symbolsTable) do
     IO.puts "package macroCompiled;"
@@ -60,6 +62,14 @@ defmodule MacroCompiler.CodeGenerationHeader do
   end
 
   defp find_requirements(%UndefScalarVariable{scalar_variable: scalar_variable}, ast, symbolsTable) do
+    find_requirements(scalar_variable, ast, symbolsTable)
+  end
+
+  defp find_requirements(%IncrementExpression{scalar_variable: scalar_variable}, ast, symbolsTable) do
+    find_requirements(scalar_variable, ast, symbolsTable)
+  end
+
+  defp find_requirements(%DecrementExpression{scalar_variable: scalar_variable}, ast, symbolsTable) do
     find_requirements(scalar_variable, ast, symbolsTable)
   end
 

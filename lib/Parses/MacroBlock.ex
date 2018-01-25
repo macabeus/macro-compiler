@@ -11,6 +11,8 @@ defmodule MacroCompiler.MacroBlock do
   alias MacroCompiler.ScalarVariableAssignment
   alias MacroCompiler.ArrayVariableAssignment
   alias MacroCompiler.HashVariableAssignment
+  alias MacroCompiler.IncrementExpression
+  alias MacroCompiler.DecrementExpression
   alias MacroCompiler.PauseExpression
 
   def parser() do
@@ -25,6 +27,8 @@ defmodule MacroCompiler.MacroBlock do
           ScalarVariableAssignment.parser(),
           ArrayVariableAssignment.parser(),
           HashVariableAssignment.parser(),
+          IncrementExpression.parser(),
+          DecrementExpression.parser(),
           PauseExpression.parser(),
 
           SyntaxError.raiseAtPosition(),

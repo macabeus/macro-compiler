@@ -14,6 +14,8 @@ defmodule MacroCompiler.Identifier do
            ?] -> false;
            ?{ -> false;
            ?} -> false;
+           ?+ -> false;
+           ?- -> false;
 
            _ -> true
          end
