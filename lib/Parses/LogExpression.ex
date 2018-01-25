@@ -1,6 +1,8 @@
 defmodule MacroCompiler.LogExpression do
   use Combine
   use Combine.Helpers
+  alias MacroCompiler.ArrayVariable
+  alias MacroCompiler.HashVariable
 
   @enforce_keys [:message]
   defstruct [:message]
@@ -11,9 +13,19 @@ defmodule MacroCompiler.LogExpression do
         ignore(string("log")),
         ignore(spaces()),
 
-        take_while(fn ?\n -> false; _ -> true end)
+        many(
+          choice([
+            string("\\@"),
+            string("\\%"),
+            ArrayVariable.parser(),
+            HashVariable.parser(),
+            if_not(char(?\n), char())
+          ])
+        ),
+
+        skip(char(?\n))
       ]),
-      fn [message] -> %MacroCompiler.LogExpression{message: message |> List.to_string} end
+      fn [message] -> %MacroCompiler.LogExpression{message: message} end
     )
   end
 end

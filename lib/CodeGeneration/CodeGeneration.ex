@@ -41,6 +41,25 @@ defmodule MacroCompiler.CodeGeneration do
   end
 
   def generate(%LogExpression{message: message}, _ast, _symbolsTable) do
+    message =
+      message
+      |> Enum.map(&(
+        case &1 do
+          %ArrayVariable{name: name} ->
+            "\".scalar(@#{name}).\""
+
+          %HashVariable{name: name} ->
+            "\".scalar(keys %#{name}).\""
+
+          "\"" ->
+            "\\\""
+
+          char ->
+            char
+        end)
+      )
+      |> List.to_string
+
     IO.puts "message \"#{message}\\n\";"
   end
 
