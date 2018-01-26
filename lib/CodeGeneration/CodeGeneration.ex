@@ -14,6 +14,7 @@ defmodule MacroCompiler.CodeGeneration do
   alias MacroCompiler.DecrementExpression
   alias MacroCompiler.PauseExpression
   alias MacroCompiler.PushExpression
+  alias MacroCompiler.PopExpression
   alias MacroCompiler.TextValue
 
   def generate(block, ast, symbolsTable) when is_list(block) do
@@ -146,6 +147,12 @@ defmodule MacroCompiler.CodeGeneration do
     generate(array_variable, ast, symbolsTable)
     IO.puts(",")
     IO.puts(generate(text, ast, symbolsTable))
+    IO.puts(";")
+  end
+
+  def generate(%PopExpression{array_variable: array_variable}, ast, symbolsTable) do
+    IO.puts "pop "
+    generate(array_variable, ast, symbolsTable)
     IO.puts(";")
   end
 
