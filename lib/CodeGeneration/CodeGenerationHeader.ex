@@ -13,6 +13,7 @@ defmodule MacroCompiler.CodeGenerationHeader do
   alias MacroCompiler.DecrementExpression
   alias MacroCompiler.PushExpression
   alias MacroCompiler.PopExpression
+  alias MacroCompiler.ShiftExpression
 
   def generate(node, ast, symbolsTable) do
     IO.puts "package macroCompiled;"
@@ -80,6 +81,10 @@ defmodule MacroCompiler.CodeGenerationHeader do
   end
 
   defp find_requirements(%PopExpression{array_variable: array_variable}, ast, symbolsTable) do
+    find_requirements(array_variable, ast, symbolsTable)
+  end
+
+  defp find_requirements(%ShiftExpression{array_variable: array_variable}, ast, symbolsTable) do
     find_requirements(array_variable, ast, symbolsTable)
   end
 

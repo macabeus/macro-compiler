@@ -16,6 +16,7 @@ defmodule MacroCompiler.MacroBlock do
   alias MacroCompiler.PauseExpression
   alias MacroCompiler.PushExpression
   alias MacroCompiler.PopExpression
+  alias MacroCompiler.ShiftExpression
 
   def parser() do
     many(
@@ -34,6 +35,7 @@ defmodule MacroCompiler.MacroBlock do
           PauseExpression.parser(),
           PushExpression.parser(),
           PopExpression.parser(),
+          ShiftExpression.parser(),
 
           SyntaxError.raiseAtPosition(),
         ]),

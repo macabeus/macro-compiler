@@ -16,6 +16,7 @@ defmodule MacroCompiler.CodeGeneration do
   alias MacroCompiler.PushExpression
   alias MacroCompiler.PopExpression
   alias MacroCompiler.TextValue
+  alias MacroCompiler.ShiftExpression
 
   def generate(block, ast, symbolsTable) when is_list(block) do
     Enum.map(block, &(generate(&1, ast, symbolsTable)))
@@ -152,6 +153,12 @@ defmodule MacroCompiler.CodeGeneration do
 
   def generate(%PopExpression{array_variable: array_variable}, ast, symbolsTable) do
     IO.puts "pop "
+    generate(array_variable, ast, symbolsTable)
+    IO.puts(";")
+  end
+
+  def generate(%ShiftExpression{array_variable: array_variable}, ast, symbolsTable) do
+    IO.puts "shift "
     generate(array_variable, ast, symbolsTable)
     IO.puts(";")
   end
