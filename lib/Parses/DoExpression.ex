@@ -1,9 +1,10 @@
 defmodule MacroCompiler.DoExpression do
   use Combine
   use Combine.Helpers
+  alias MacroCompiler.TextValue
 
-  @enforce_keys [:action]
-  defstruct [:action]
+  @enforce_keys [:text]
+  defstruct [:text]
 
   def parser() do
     map(
@@ -11,9 +12,9 @@ defmodule MacroCompiler.DoExpression do
         ignore(string("do")),
         skip(space()),
 
-        take_while(fn ?\n -> false; _ -> true end)
+        TextValue.parser(false)
       ]),
-      fn [action] -> %MacroCompiler.DoExpression{action: action |> List.to_string} end
+      fn [text] -> %MacroCompiler.DoExpression{text: text} end
     )
   end
 end

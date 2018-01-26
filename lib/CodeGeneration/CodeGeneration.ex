@@ -14,6 +14,7 @@ defmodule MacroCompiler.CodeGeneration do
   alias MacroCompiler.DecrementExpression
   alias MacroCompiler.PauseExpression
   alias MacroCompiler.PushExpression
+  alias MacroCompiler.TextValue
 
   def generate(block, ast, symbolsTable) when is_list(block) do
     Enum.map(block, &(generate(&1, ast, symbolsTable)))
@@ -28,6 +29,28 @@ defmodule MacroCompiler.CodeGeneration do
     IO.puts "}"
   end
 
+  def generate(%TextValue{values: values}, _ast, _symbolsTable) do
+    values = values
+    |> Enum.map(&(
+      case &1 do
+        %ArrayVariable{name: name} ->
+          "\".scalar(@#{name}).\""
+
+        %HashVariable{name: name} ->
+          "\".scalar(keys %#{name}).\""
+
+        "\"" ->
+          "\\\""
+
+        char ->
+          char
+      end)
+    )
+    |> List.to_string
+
+    "\"#{values}\""
+  end
+
   def generate(%CallExpression{macro: macro, params: params}, _ast, _symbolsTable) do
     params =
       params
@@ -37,31 +60,12 @@ defmodule MacroCompiler.CodeGeneration do
     IO.puts "&macro_#{macro}(#{params});"
   end
 
-  def generate(%DoExpression{action: action}, _ast, _symbolsTable) do
-    IO.puts "Commands::run(\"#{action}\");"
+  def generate(%DoExpression{text: text}, ast, symbolsTable) do
+    IO.puts "Commands::run(#{generate(text, ast, symbolsTable)});"
   end
 
-  def generate(%LogExpression{message: message}, _ast, _symbolsTable) do
-    message =
-      message
-      |> Enum.map(&(
-        case &1 do
-          %ArrayVariable{name: name} ->
-            "\".scalar(@#{name}).\""
-
-          %HashVariable{name: name} ->
-            "\".scalar(keys %#{name}).\""
-
-          "\"" ->
-            "\\\""
-
-          char ->
-            char
-        end)
-      )
-      |> List.to_string
-
-    IO.puts "message \"#{message}\\n\";"
+  def generate(%LogExpression{text: text}, ast, symbolsTable) do
+    IO.puts "message #{generate(text, ast, symbolsTable)}.\"\\n\";"
   end
 
   def generate(%ScalarVariable{name: name, array_position: array_position, hash_position: hash_position}, _ast, _symbolsTable) do
@@ -77,40 +81,40 @@ defmodule MacroCompiler.CodeGeneration do
     end
   end
 
-  def generate(%ScalarVariableAssignment{scalar_variable: scalar_variable, value: value}, ast, symbolsTable) do
+  def generate(%ScalarVariableAssignment{scalar_variable: scalar_variable, text: text}, ast, symbolsTable) do
     generate(scalar_variable, ast, symbolsTable)
 
-    IO.puts " = \"#{value}\";"
+    IO.puts " = #{generate(text, ast, symbolsTable)};"
   end
 
   def generate(%ArrayVariable{name: name}, _ast, _symbolsTable) do
     IO.puts "@#{name}"
   end
 
-  def generate(%ArrayVariableAssignment{array_variable: array_variable, values: values}, ast, symbolsTable) do
+  def generate(%ArrayVariableAssignment{array_variable: array_variable, texts: texts}, ast, symbolsTable) do
     generate(array_variable, ast, symbolsTable)
 
-    values =
-      values
-      |> Enum.map(&("\"#{&1}\""))
+    texts =
+      texts
+      |> Enum.map(&(generate(&1, ast, symbolsTable)))
       |> Enum.join(",")
 
-    IO.puts " = (#{values});"
+    IO.puts " = (#{texts});"
   end
 
   def generate(%HashVariable{name: name}, _ast, _symbolsTable) do
     IO.puts "%#{name}"
   end
 
-  def generate(%HashVariableAssignment{hash_variable: hash_variable, keysvalues: keysvalues}, ast, symbolsTable) do
+  def generate(%HashVariableAssignment{hash_variable: hash_variable, keystexts: keystexts}, ast, symbolsTable) do
     generate(hash_variable, ast, symbolsTable)
 
-    keysvalues =
-      keysvalues
-      |> Enum.map(&("\"#{Enum.at(&1, 0)}\" => \"#{Enum.at(&1, 1)}\""))
+    keystexts =
+      keystexts
+      |> Enum.map(&("\"#{Enum.at(&1, 0)}\" => #{generate(Enum.at(&1, 1), ast, symbolsTable)}"))
       |> Enum.join(",")
 
-    IO.puts " = (#{keysvalues});"
+    IO.puts " = (#{keystexts});"
   end
 
   def generate(%UndefScalarVariable{scalar_variable: scalar_variable}, ast, symbolsTable) do
@@ -137,11 +141,11 @@ defmodule MacroCompiler.CodeGeneration do
     # TODO
   end
 
-  def generate(%PushExpression{array_variable: array_variable, value: value}, ast, symbolsTable) do
+  def generate(%PushExpression{array_variable: array_variable, text: text}, ast, symbolsTable) do
     IO.puts "push "
     generate(array_variable, ast, symbolsTable)
     IO.puts(",")
-    IO.puts("#{value}")
+    IO.puts(generate(text, ast, symbolsTable))
     IO.puts(";")
   end
 

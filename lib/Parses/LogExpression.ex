@@ -1,11 +1,10 @@
 defmodule MacroCompiler.LogExpression do
   use Combine
   use Combine.Helpers
-  alias MacroCompiler.ArrayVariable
-  alias MacroCompiler.HashVariable
+  alias MacroCompiler.TextValue
 
-  @enforce_keys [:message]
-  defstruct [:message]
+  @enforce_keys [:text]
+  defstruct [:text]
 
   def parser() do
     map(
@@ -13,19 +12,11 @@ defmodule MacroCompiler.LogExpression do
         ignore(string("log")),
         ignore(spaces()),
 
-        many(
-          choice([
-            string("\\@"),
-            string("\\%"),
-            ArrayVariable.parser(),
-            HashVariable.parser(),
-            if_not(char(?\n), char())
-          ])
-        ),
+        TextValue.parser(false),
 
         skip(char(?\n))
       ]),
-      fn [message] -> %MacroCompiler.LogExpression{message: message} end
+      fn [text] -> %MacroCompiler.LogExpression{text: text} end
     )
   end
 end

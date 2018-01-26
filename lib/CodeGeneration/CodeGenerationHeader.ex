@@ -42,23 +42,23 @@ defmodule MacroCompiler.CodeGenerationHeader do
     find_requirements(block, ast, symbolsTable)
   end
 
-  defp find_requirements(%DoExpression{action: _action}, _ast, _symbolsTable) do
+  defp find_requirements(%DoExpression{text: _text}, _ast, _symbolsTable) do
     %{module: "Commands"}
   end
 
-  defp find_requirements(%LogExpression{message: _message}, _ast, _symbolsTable) do
+  defp find_requirements(%LogExpression{text: _text}, _ast, _symbolsTable) do
     %{module: "Log qw(message)"}
   end
 
-  defp find_requirements(%ScalarVariableAssignment{scalar_variable: scalar_variable, value: _value}, ast, symbolsTable) do
+  defp find_requirements(%ScalarVariableAssignment{scalar_variable: scalar_variable, text: _text}, ast, symbolsTable) do
     find_requirements(scalar_variable, ast, symbolsTable)
   end
 
-  defp find_requirements(%ArrayVariableAssignment{array_variable: array_variable, values: _values}, ast, symbolsTable) do
+  defp find_requirements(%ArrayVariableAssignment{array_variable: array_variable, texts: _texts}, ast, symbolsTable) do
     find_requirements(array_variable, ast, symbolsTable)
   end
 
-  defp find_requirements(%HashVariableAssignment{hash_variable: hash_variable, keysvalues: _keysvalues}, ast, symbolsTable) do
+  defp find_requirements(%HashVariableAssignment{hash_variable: hash_variable, keystexts: _keystexts}, ast, symbolsTable) do
     find_requirements(hash_variable, ast, symbolsTable)
   end
 
@@ -74,7 +74,7 @@ defmodule MacroCompiler.CodeGenerationHeader do
     find_requirements(scalar_variable, ast, symbolsTable)
   end
 
-  defp find_requirements(%PushExpression{array_variable: array_variable, value: _value}, ast, symbolsTable) do
+  defp find_requirements(%PushExpression{array_variable: array_variable, text: _text}, ast, symbolsTable) do
     find_requirements(array_variable, ast, symbolsTable)
   end
 

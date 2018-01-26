@@ -2,9 +2,10 @@ defmodule MacroCompiler.ScalarVariableAssignment do
   use Combine
   use Combine.Helpers
   alias MacroCompiler.ScalarVariable
+  alias MacroCompiler.TextValue
 
-  @enforce_keys [:scalar_variable, :value]
-  defstruct [:scalar_variable, :value]
+  @enforce_keys [:scalar_variable, :text]
+  defstruct [:scalar_variable, :text]
 
   def parser() do
     map(
@@ -15,9 +16,9 @@ defmodule MacroCompiler.ScalarVariableAssignment do
         ignore(string("=")),
         skip(spaces()),
 
-        take_while(fn ?\n -> false; _ -> true end)
+        TextValue.parser()
       ]),
-      fn [scalar_variable, value] -> %MacroCompiler.ScalarVariableAssignment{scalar_variable: scalar_variable, value: value |> List.to_string} end
+      fn [scalar_variable, text] -> %MacroCompiler.ScalarVariableAssignment{scalar_variable: scalar_variable, text: text} end
     )
   end
 end

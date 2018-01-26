@@ -3,9 +3,10 @@ defmodule MacroCompiler.HashVariableAssignment do
   use Combine.Helpers
   alias MacroCompiler.HashVariable
   alias MacroCompiler.Identifier
+  alias MacroCompiler.TextValue
 
-  @enforce_keys [:hash_variable, :keysvalues]
-  defstruct [:hash_variable, :keysvalues]
+  @enforce_keys [:hash_variable, :keystexts]
+  defstruct [:hash_variable, :keystexts]
 
   def parser() do
     map(
@@ -24,9 +25,9 @@ defmodule MacroCompiler.HashVariableAssignment do
             ignore(spaces()),
             ignore(string("=>")),
             ignore(spaces()),
-            Identifier.parser()
+            TextValue.parser()
           ]),
-          
+
           sequence([
             char(","),
             skip(spaces())
@@ -37,7 +38,7 @@ defmodule MacroCompiler.HashVariableAssignment do
 
         skip(char(?\n))
       ]),
-      fn [hash_variable, keysvalues] -> %MacroCompiler.HashVariableAssignment{hash_variable: hash_variable, keysvalues: keysvalues} end
+      fn [hash_variable, keystexts] -> %MacroCompiler.HashVariableAssignment{hash_variable: hash_variable, keystexts: keystexts} end
     )
   end
 end
