@@ -16,7 +16,7 @@ defmodule MacroCompiler do
       SemanticAnalysis.start_validate(ast, table)
 
       CodeGenerationHeader.generate(ast, ast, table)
-      CodeGeneration.generate(ast, ast, table)
+      CodeGeneration.start_generate(ast, ast, table)
 
     rescue
       e in MacroCompiler.SyntaxError ->
