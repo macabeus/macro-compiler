@@ -14,6 +14,7 @@ defmodule MacroCompiler.CodeGenerationHeader do
   alias MacroCompiler.PushExpression
   alias MacroCompiler.PopExpression
   alias MacroCompiler.ShiftExpression
+  alias MacroCompiler.UnshiftExpression
 
   def generate(node, ast, symbolsTable) do
     IO.puts "package macroCompiled;"
@@ -85,6 +86,10 @@ defmodule MacroCompiler.CodeGenerationHeader do
   end
 
   defp find_requirements(%ShiftExpression{array_variable: array_variable}, ast, symbolsTable) do
+    find_requirements(array_variable, ast, symbolsTable)
+  end
+
+  defp find_requirements(%UnshiftExpression{array_variable: array_variable, text: _text}, ast, symbolsTable) do
     find_requirements(array_variable, ast, symbolsTable)
   end
 
