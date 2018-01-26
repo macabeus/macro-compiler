@@ -13,6 +13,7 @@ defmodule MacroCompiler.CodeGeneration do
   alias MacroCompiler.IncrementExpression
   alias MacroCompiler.DecrementExpression
   alias MacroCompiler.PauseExpression
+  alias MacroCompiler.PushExpression
 
   def generate(block, ast, symbolsTable) when is_list(block) do
     Enum.map(block, &(generate(&1, ast, symbolsTable)))
@@ -134,6 +135,14 @@ defmodule MacroCompiler.CodeGeneration do
 
   def generate(%PauseExpression{seconds: _seconds}, _ast, _symbolsTable) do
     # TODO
+  end
+
+  def generate(%PushExpression{array_variable: array_variable, value: value}, ast, symbolsTable) do
+    IO.puts "push "
+    generate(array_variable, ast, symbolsTable)
+    IO.puts(",")
+    IO.puts("#{value}")
+    IO.puts(";")
   end
 
   def generate(_undefinedNode, _ast, _symbolsTable) do
