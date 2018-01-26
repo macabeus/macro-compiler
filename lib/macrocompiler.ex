@@ -13,7 +13,7 @@ defmodule MacroCompiler do
       [ast] = Combine.parse(file, TopLevelBlock.parser())
       table = SymbolsTable.build(ast)
 
-      SemanticAnalysis.validate(ast, ast, table)
+      SemanticAnalysis.start_validate(ast, table)
 
       CodeGenerationHeader.generate(ast, ast, table)
       CodeGeneration.generate(ast, ast, table)

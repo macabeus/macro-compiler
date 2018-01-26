@@ -1,6 +1,7 @@
 defmodule MacroCompiler.TextValue do
   use Combine
   use Combine.Helpers
+  alias MacroCompiler.ScalarVariable
   alias MacroCompiler.ArrayVariable
   alias MacroCompiler.HashVariable
 
@@ -35,8 +36,10 @@ defmodule MacroCompiler.TextValue do
       many(
         choice([
           map(string("\\,"), fn _ -> "," end),
+          string("\\$"),
           string("\\@"),
           string("\\%"),
+          ScalarVariable.parser(),
           ArrayVariable.parser(),
           HashVariable.parser(),
           get_char(limited)

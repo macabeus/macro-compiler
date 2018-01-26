@@ -36,6 +36,15 @@ defmodule MacroCompiler.CodeGeneration do
     values = values
     |> Enum.map(&(
       case &1 do
+        %ScalarVariable{name: name, array_position: nil, hash_position: nil} ->
+          "$#{name}"
+
+        %ScalarVariable{name: name, array_position: array_position, hash_position: nil} ->
+          "$#{name}[#{array_position}]"
+
+        %ScalarVariable{name: name, array_position: nil, hash_position: hash_position} ->
+          "$#{name}{#{hash_position}}"
+
         %ArrayVariable{name: name} ->
           "\".scalar(@#{name}).\""
 
