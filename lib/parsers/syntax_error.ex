@@ -5,12 +5,12 @@ defmodule MacroCompiler.Parser.SyntaxError do
   alias MacroCompiler.Parser.SyntaxError
   alias Combine.ParserState
 
-  defexception [:message, :line, :col]
+  defexception [:message, :line, :offset]
 
   defparser raiseAtPosition(%ParserState{status: :ok, line: line, column: col} = state) do
     raise SyntaxError,
-      message: "Syntax error at line #{line}, column #{col}",
+      message: "Unknow syntax error",
       line: line,
-      col: col
+      offset: col
   end
 end
