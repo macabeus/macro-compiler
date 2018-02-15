@@ -1,5 +1,5 @@
 defmodule MacroCompiler.MacroSymbolsTable do
-  alias MacroCompiler.Macro
+  alias MacroCompiler.Parser.Macro
 
   @enforce_keys [:name]
   defstruct [:name]

@@ -1,6 +1,8 @@
 defmodule MacroCompiler do
   use Combine
-  alias MacroCompiler.TopLevelBlock
+
+  alias MacroCompiler.Parser.TopLevelBlock
+  alias MacroCompiler.Parser.SyntaxError
   alias MacroCompiler.SymbolsTable
   alias MacroCompiler.SemanticAnalysis
   alias MacroCompiler.CodeGeneration
@@ -19,8 +21,8 @@ defmodule MacroCompiler do
       CodeGeneration.start_generate(ast, ast, table)
 
     rescue
-      e in MacroCompiler.SyntaxError ->
-        %MacroCompiler.SyntaxError{col: col, line: line, message: message} = e
+      e in SyntaxError ->
+        %SyntaxError{col: col, line: line, message: message} = e
 
         IO.puts IO.ANSI.format([:red, :bright, "#{message}\n"], true)
 

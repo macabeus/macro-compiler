@@ -1,7 +1,9 @@
-defmodule MacroCompiler.UndefScalarVariable do
+defmodule MacroCompiler.Parser.UndefCommand do
   use Combine
   use Combine.Helpers
-  alias MacroCompiler.ScalarVariable
+
+  alias MacroCompiler.Parser.UndefCommand
+  alias MacroCompiler.Parser.ScalarVariable
 
   @enforce_keys [:scalar_variable]
   defstruct [:scalar_variable]
@@ -22,7 +24,7 @@ defmodule MacroCompiler.UndefScalarVariable do
 
         ignore(char(?\n))
       ]),
-      fn [scalar_variable] -> %MacroCompiler.UndefScalarVariable{scalar_variable: scalar_variable} end
+      fn [scalar_variable] -> %UndefCommand{scalar_variable: scalar_variable} end
     )
   end
 end

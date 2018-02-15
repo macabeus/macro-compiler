@@ -1,8 +1,10 @@
-defmodule MacroCompiler.ArrayVariableAssignment do
+defmodule MacroCompiler.Parser.ArrayAssignmentCommand do
   use Combine
   use Combine.Helpers
-  alias MacroCompiler.ArrayVariable
-  alias MacroCompiler.TextValue
+
+  alias MacroCompiler.Parser.ArrayAssignmentCommand
+  alias MacroCompiler.Parser.ArrayVariable
+  alias MacroCompiler.Parser.TextValue
 
   @enforce_keys [:array_variable, :texts]
   defstruct [:array_variable, :texts]
@@ -30,7 +32,7 @@ defmodule MacroCompiler.ArrayVariableAssignment do
 
         skip(char(?\n))
       ]),
-      fn [scalar_variable, texts] -> %MacroCompiler.ArrayVariableAssignment{array_variable: scalar_variable, texts: texts} end
+      fn [scalar_variable, texts] -> %ArrayAssignmentCommand{array_variable: scalar_variable, texts: texts} end
     )
   end
 end

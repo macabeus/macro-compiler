@@ -1,7 +1,9 @@
-defmodule MacroCompiler.ArrayVariable do
+defmodule MacroCompiler.Parser.ArrayVariable do
   use Combine
   use Combine.Helpers
-  alias MacroCompiler.Identifier
+
+  alias MacroCompiler.Parser.ArrayVariable
+  alias MacroCompiler.Parser.Identifier
 
   @enforce_keys [:name]
   defstruct [:name]
@@ -12,7 +14,7 @@ defmodule MacroCompiler.ArrayVariable do
         ignore(string("@")),
         Identifier.parser()
       ]),
-      fn [name] -> %MacroCompiler.ArrayVariable{name: name} end
+      fn [name] -> %ArrayVariable{name: name} end
     )
   end
 end

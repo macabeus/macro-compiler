@@ -1,7 +1,9 @@
-defmodule MacroCompiler.PopExpression do
+defmodule MacroCompiler.Parser.ShiftCommand do
   use Combine
   use Combine.Helpers
-  alias MacroCompiler.ArrayVariable
+
+  alias MacroCompiler.Parser.ShiftCommand
+  alias MacroCompiler.Parser.ArrayVariable
 
   @enforce_keys [:array_variable]
   defstruct [:array_variable]
@@ -9,7 +11,7 @@ defmodule MacroCompiler.PopExpression do
   def parser() do
     map(
       sequence([
-        ignore(string("&pop(")),
+        ignore(string("&shift(")),
 
         ArrayVariable.parser(),
 
@@ -17,7 +19,7 @@ defmodule MacroCompiler.PopExpression do
 
         skip(newline())
       ]),
-      fn [array_variable] -> %MacroCompiler.PopExpression{array_variable: array_variable} end
+      fn [array_variable] -> %ShiftCommand{array_variable: array_variable} end
     )
   end
 end

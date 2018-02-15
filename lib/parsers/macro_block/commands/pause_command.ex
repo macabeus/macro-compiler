@@ -1,6 +1,8 @@
-defmodule MacroCompiler.PauseExpression do
+defmodule MacroCompiler.Parser.PauseCommand do
   use Combine
   use Combine.Helpers
+
+  alias MacroCompiler.Parser.PauseCommand
 
   @enforce_keys [:seconds]
   defstruct [:seconds]
@@ -17,7 +19,7 @@ defmodule MacroCompiler.PauseExpression do
         )),
         skip(char(?\n))
       ]),
-      fn [seconds] -> %MacroCompiler.PauseExpression{seconds: seconds} end
+      fn [seconds] -> %PauseCommand{seconds: seconds} end
     )
   end
 end

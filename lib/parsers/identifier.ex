@@ -1,4 +1,4 @@
-defmodule MacroCompiler.Identifier do
+defmodule MacroCompiler.Parser.Identifier do
   use Combine
   use Combine.Helpers
 

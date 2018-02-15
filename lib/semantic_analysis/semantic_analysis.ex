@@ -1,24 +1,24 @@
 defmodule MacroCompiler.SemanticAnalysis do
   alias MacroCompiler.MacroSymbolsTable
 
-  alias MacroCompiler.Macro
-  alias MacroCompiler.CallExpression
-  alias MacroCompiler.DoExpression
-  alias MacroCompiler.LogExpression
-  alias MacroCompiler.UndefScalarVariable
-  alias MacroCompiler.ScalarVariableAssignment
-  alias MacroCompiler.ArrayVariableAssignment
-  alias MacroCompiler.HashVariableAssignment
-  alias MacroCompiler.ScalarVariable
-  alias MacroCompiler.ArrayVariable
-  alias MacroCompiler.HashVariable
-  alias MacroCompiler.IncrementExpression
-  alias MacroCompiler.DecrementExpression
-  alias MacroCompiler.PushExpression
-  alias MacroCompiler.PopExpression
-  alias MacroCompiler.TextValue
-  alias MacroCompiler.ShiftExpression
-  alias MacroCompiler.UnshiftExpression
+  alias MacroCompiler.Parser.Macro
+  alias MacroCompiler.Parser.CallCommand
+  alias MacroCompiler.Parser.DoCommand
+  alias MacroCompiler.Parser.LogCommand
+  alias MacroCompiler.Parser.UndefCommand
+  alias MacroCompiler.Parser.ScalarAssignmentCommand
+  alias MacroCompiler.Parser.ArrayAssignmentCommand
+  alias MacroCompiler.Parser.HashAssignmentCommand
+  alias MacroCompiler.Parser.ScalarVariable
+  alias MacroCompiler.Parser.ArrayVariable
+  alias MacroCompiler.Parser.HashVariable
+  alias MacroCompiler.Parser.IncrementCommand
+  alias MacroCompiler.Parser.DecrementCommand
+  alias MacroCompiler.Parser.PushCommand
+  alias MacroCompiler.Parser.PopCommand
+  alias MacroCompiler.Parser.TextValue
+  alias MacroCompiler.Parser.ShiftCommand
+  alias MacroCompiler.Parser.UnshiftCommand
 
   alias MacroCompiler.SemanticAnalysisError
   import MacroCompiler.CheckVariablesUse
@@ -40,7 +40,7 @@ defmodule MacroCompiler.SemanticAnalysis do
     validate(block, ast, symbolsTable)
   end
 
-  defp validate(%CallExpression{macro: macro, params: _params}, _ast, symbolsTable) do
+  defp validate(%CallCommand{macro: macro, params: _params}, _ast, symbolsTable) do
     macroNameExists = Enum.find(
       symbolsTable,
       fn %MacroSymbolsTable{name: ^macro} -> true; _ -> false end
@@ -52,77 +52,77 @@ defmodule MacroCompiler.SemanticAnalysis do
     end
   end
 
-  defp validate(%DoExpression{text: text}, ast, symbolsTable) do
+  defp validate(%DoCommand{text: text}, ast, symbolsTable) do
     %{
       variable_read: validate(text, ast, symbolsTable)
     }
   end
 
-  defp validate(%LogExpression{text: text}, ast, symbolsTable) do
+  defp validate(%LogCommand{text: text}, ast, symbolsTable) do
     %{
       variable_read: validate(text, ast, symbolsTable)
     }
   end
 
-  defp validate(%ScalarVariableAssignment{scalar_variable: scalar_variable, text: text}, ast, symbolsTable) do
+  defp validate(%ScalarAssignmentCommand{scalar_variable: scalar_variable, text: text}, ast, symbolsTable) do
     %{
       variable_write: validate(scalar_variable, ast, symbolsTable),
       variable_read: validate(text, ast, symbolsTable)
     }
   end
 
-  defp validate(%ArrayVariableAssignment{array_variable: array_variable, texts: texts}, ast, symbolsTable) do
+  defp validate(%ArrayAssignmentCommand{array_variable: array_variable, texts: texts}, ast, symbolsTable) do
     %{
       variable_write: validate(array_variable, ast, symbolsTable),
       variable_read: validate(texts, ast, symbolsTable)
     }
   end
 
-  defp validate(%HashVariableAssignment{hash_variable: hash_variable, keystexts: keystexts}, ast, symbolsTable) do
+  defp validate(%HashAssignmentCommand{hash_variable: hash_variable, keystexts: keystexts}, ast, symbolsTable) do
     %{
       variable_write: validate(hash_variable, ast, symbolsTable),
       variable_read: validate(keystexts, ast, symbolsTable)
     }
   end
 
-  defp validate(%UndefScalarVariable{scalar_variable: scalar_variable}, ast, symbolsTable) do
+  defp validate(%UndefCommand{scalar_variable: scalar_variable}, ast, symbolsTable) do
     %{
       variable_write: validate(scalar_variable, ast, symbolsTable)
     }
   end
 
-  defp validate(%IncrementExpression{scalar_variable: scalar_variable}, ast, symbolsTable) do
+  defp validate(%IncrementCommand{scalar_variable: scalar_variable}, ast, symbolsTable) do
     %{
       variable_write: validate(scalar_variable, ast, symbolsTable)
     }
   end
 
-  defp validate(%DecrementExpression{scalar_variable: scalar_variable}, ast, symbolsTable) do
+  defp validate(%DecrementCommand{scalar_variable: scalar_variable}, ast, symbolsTable) do
     %{
       variable_write: validate(scalar_variable, ast, symbolsTable)
     }
   end
 
-  defp validate(%PushExpression{array_variable: array_variable, text: text}, ast, symbolsTable) do
+  defp validate(%PushCommand{array_variable: array_variable, text: text}, ast, symbolsTable) do
     %{
       variable_write: validate(array_variable, ast, symbolsTable),
       variable_read: validate(text, ast, symbolsTable)
     }
   end
 
-  defp validate(%PopExpression{array_variable: array_variable}, ast, symbolsTable) do
+  defp validate(%PopCommand{array_variable: array_variable}, ast, symbolsTable) do
     %{
       variable_read: validate(array_variable, ast, symbolsTable)
     }
   end
 
-  defp validate(%ShiftExpression{array_variable: array_variable}, ast, symbolsTable) do
+  defp validate(%ShiftCommand{array_variable: array_variable}, ast, symbolsTable) do
     %{
       variable_read: validate(array_variable, ast, symbolsTable)
     }
   end
 
-  defp validate(%UnshiftExpression{array_variable: array_variable, text: text}, ast, symbolsTable) do
+  defp validate(%UnshiftCommand{array_variable: array_variable, text: text}, ast, symbolsTable) do
     %{
       variable_write: validate(array_variable, ast, symbolsTable),
       variable_read: validate(text, ast, symbolsTable)

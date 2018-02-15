@@ -1,5 +1,5 @@
 defmodule MacroCompiler.SymbolsTable do
-  alias MacroCompiler.Macro
+  alias MacroCompiler.Parser.Macro
   alias MacroCompiler.MacroSymbolsTable
 
   def build(ast) do

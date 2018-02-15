@@ -1,8 +1,10 @@
-defmodule MacroCompiler.Macro do
+defmodule MacroCompiler.Parser.Macro do
   use Combine
   use Combine.Helpers
-  alias MacroCompiler.MacroBlock
-  alias MacroCompiler.Identifier
+
+  alias MacroCompiler.Parser.Macro
+  alias MacroCompiler.Parser.MacroBlock
+  alias MacroCompiler.Parser.Identifier
 
   @enforce_keys [:name, :block]
   defstruct [:name, :block]
@@ -23,7 +25,7 @@ defmodule MacroCompiler.Macro do
 
         ignore(char("}"))
       ]),
-      fn [macro_name, block] -> %MacroCompiler.Macro{name: macro_name, block: block} end
+      fn [macro_name, block] -> %Macro{name: macro_name, block: block} end
     )
   end
 end

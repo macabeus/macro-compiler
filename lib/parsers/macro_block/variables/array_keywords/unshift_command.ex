@@ -1,8 +1,10 @@
-defmodule MacroCompiler.PushExpression do
+defmodule MacroCompiler.Parser.UnshiftCommand do
   use Combine
   use Combine.Helpers
-  alias MacroCompiler.ArrayVariable
-  alias MacroCompiler.TextValue
+
+  alias MacroCompiler.Parser.UnshiftCommand
+  alias MacroCompiler.Parser.ArrayVariable
+  alias MacroCompiler.Parser.TextValue
 
   @enforce_keys [:array_variable, :text]
   defstruct [:array_variable, :text]
@@ -10,7 +12,7 @@ defmodule MacroCompiler.PushExpression do
   def parser() do
     map(
       sequence([
-        ignore(string("&push(")),
+        ignore(string("&unshift(")),
 
         ArrayVariable.parser(),
 
@@ -24,7 +26,7 @@ defmodule MacroCompiler.PushExpression do
 
         skip(newline())
       ]),
-      fn [array_variable, text] -> %MacroCompiler.PushExpression{array_variable: array_variable, text: text} end
+      fn [array_variable, text] -> %UnshiftCommand{array_variable: array_variable, text: text} end
     )
   end
 end

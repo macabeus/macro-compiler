@@ -1,7 +1,9 @@
-defmodule MacroCompiler.DoExpression do
+defmodule MacroCompiler.Parser.DoCommand do
   use Combine
   use Combine.Helpers
-  alias MacroCompiler.TextValue
+
+  alias MacroCompiler.Parser.DoCommand
+  alias MacroCompiler.Parser.TextValue
 
   @enforce_keys [:text]
   defstruct [:text]
@@ -14,7 +16,7 @@ defmodule MacroCompiler.DoExpression do
 
         TextValue.parser(false)
       ]),
-      fn [text] -> %MacroCompiler.DoExpression{text: text} end
+      fn [text] -> %DoCommand{text: text} end
     )
   end
 end

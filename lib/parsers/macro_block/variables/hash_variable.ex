@@ -1,7 +1,9 @@
-defmodule MacroCompiler.HashVariable do
+defmodule MacroCompiler.Parser.HashVariable do
   use Combine
   use Combine.Helpers
-  alias MacroCompiler.Identifier
+
+  alias MacroCompiler.Parser.HashVariable
+  alias MacroCompiler.Parser.Identifier
 
   @enforce_keys [:name]
   defstruct [:name]
@@ -12,7 +14,7 @@ defmodule MacroCompiler.HashVariable do
         ignore(string("%")),
         Identifier.parser()
       ]),
-      fn [name] -> %MacroCompiler.HashVariable{name: name} end
+      fn [name] -> %HashVariable{name: name} end
     )
   end
 end

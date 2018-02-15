@@ -1,23 +1,23 @@
 defmodule MacroCompiler.CodeGeneration do
-  alias MacroCompiler.Macro
-  alias MacroCompiler.CallExpression
-  alias MacroCompiler.DoExpression
-  alias MacroCompiler.LogExpression
-  alias MacroCompiler.UndefScalarVariable
-  alias MacroCompiler.ScalarVariableAssignment
-  alias MacroCompiler.ArrayVariableAssignment
-  alias MacroCompiler.HashVariableAssignment
-  alias MacroCompiler.ScalarVariable
-  alias MacroCompiler.ArrayVariable
-  alias MacroCompiler.HashVariable
-  alias MacroCompiler.IncrementExpression
-  alias MacroCompiler.DecrementExpression
-  alias MacroCompiler.PauseExpression
-  alias MacroCompiler.PushExpression
-  alias MacroCompiler.PopExpression
-  alias MacroCompiler.TextValue
-  alias MacroCompiler.ShiftExpression
-  alias MacroCompiler.UnshiftExpression
+  alias MacroCompiler.Parser.Macro
+  alias MacroCompiler.Parser.CallCommand
+  alias MacroCompiler.Parser.DoCommand
+  alias MacroCompiler.Parser.LogCommand
+  alias MacroCompiler.Parser.UndefCommand
+  alias MacroCompiler.Parser.ScalarAssignmentCommand
+  alias MacroCompiler.Parser.ArrayAssignmentCommand
+  alias MacroCompiler.Parser.HashAssignmentCommand
+  alias MacroCompiler.Parser.ScalarVariable
+  alias MacroCompiler.Parser.ArrayVariable
+  alias MacroCompiler.Parser.HashVariable
+  alias MacroCompiler.Parser.IncrementCommand
+  alias MacroCompiler.Parser.DecrementCommand
+  alias MacroCompiler.Parser.PauseCommand
+  alias MacroCompiler.Parser.PushCommand
+  alias MacroCompiler.Parser.PopCommand
+  alias MacroCompiler.Parser.TextValue
+  alias MacroCompiler.Parser.ShiftCommand
+  alias MacroCompiler.Parser.UnshiftCommand
 
   def start_generate(block, ast, symbolsTable) do
     Enum.map(block, &(generate(&1, ast, symbolsTable)))
@@ -63,7 +63,7 @@ defmodule MacroCompiler.CodeGeneration do
     "\"#{values}\""
   end
 
-  defp generate(%CallExpression{macro: macro, params: params}, _ast, _symbolsTable) do
+  defp generate(%CallCommand{macro: macro, params: params}, _ast, _symbolsTable) do
     params =
       params
       |> Enum.map(&("\"#{&1}\""))
@@ -72,7 +72,7 @@ defmodule MacroCompiler.CodeGeneration do
     "&macro_#{macro}(#{params});"
   end
 
-  defp generate(%DoExpression{text: text}, ast, symbolsTable) do
+  defp generate(%DoCommand{text: text}, ast, symbolsTable) do
     [
       "Commands::run(",
       generate(text, ast, symbolsTable),
@@ -80,7 +80,7 @@ defmodule MacroCompiler.CodeGeneration do
     ]
   end
 
-  defp generate(%LogExpression{text: text}, ast, symbolsTable) do
+  defp generate(%LogCommand{text: text}, ast, symbolsTable) do
     [
       "message ",
       generate(text, ast, symbolsTable),
@@ -101,7 +101,7 @@ defmodule MacroCompiler.CodeGeneration do
     end
   end
 
-  defp generate(%ScalarVariableAssignment{scalar_variable: scalar_variable, text: text}, ast, symbolsTable) do
+  defp generate(%ScalarAssignmentCommand{scalar_variable: scalar_variable, text: text}, ast, symbolsTable) do
     [
       generate(scalar_variable, ast, symbolsTable),
       " = ",
@@ -114,7 +114,7 @@ defmodule MacroCompiler.CodeGeneration do
     "@#{name}"
   end
 
-  defp generate(%ArrayVariableAssignment{array_variable: array_variable, texts: texts}, ast, symbolsTable) do
+  defp generate(%ArrayAssignmentCommand{array_variable: array_variable, texts: texts}, ast, symbolsTable) do
     texts =
       texts
       |> Enum.map(&(generate(&1, ast, symbolsTable)))
@@ -130,7 +130,7 @@ defmodule MacroCompiler.CodeGeneration do
     "%#{name}"
   end
 
-  defp generate(%HashVariableAssignment{hash_variable: hash_variable, keystexts: keystexts}, ast, symbolsTable) do
+  defp generate(%HashAssignmentCommand{hash_variable: hash_variable, keystexts: keystexts}, ast, symbolsTable) do
     keystexts =
       keystexts
       |> Enum.map(&("\"#{Enum.at(&1, 0)}\" => #{generate(Enum.at(&1, 1), ast, symbolsTable)}"))
@@ -142,7 +142,7 @@ defmodule MacroCompiler.CodeGeneration do
     ]
   end
 
-  defp generate(%UndefScalarVariable{scalar_variable: scalar_variable}, ast, symbolsTable) do
+  defp generate(%UndefCommand{scalar_variable: scalar_variable}, ast, symbolsTable) do
     [
       "undef ",
 
@@ -152,7 +152,7 @@ defmodule MacroCompiler.CodeGeneration do
     ]
   end
 
-  defp generate(%IncrementExpression{scalar_variable: scalar_variable}, ast, symbolsTable) do
+  defp generate(%IncrementCommand{scalar_variable: scalar_variable}, ast, symbolsTable) do
     [
       generate(scalar_variable, ast, symbolsTable),
 
@@ -160,7 +160,7 @@ defmodule MacroCompiler.CodeGeneration do
     ]
   end
 
-  defp generate(%DecrementExpression{scalar_variable: scalar_variable}, ast, symbolsTable) do
+  defp generate(%DecrementCommand{scalar_variable: scalar_variable}, ast, symbolsTable) do
     [
       generate(scalar_variable, ast, symbolsTable),
 
@@ -168,11 +168,11 @@ defmodule MacroCompiler.CodeGeneration do
     ]
   end
 
-  defp generate(%PauseExpression{seconds: _seconds}, _ast, _symbolsTable) do
+  defp generate(%PauseCommand{seconds: _seconds}, _ast, _symbolsTable) do
     # TODO
   end
 
-  defp generate(%PushExpression{array_variable: array_variable, text: text}, ast, symbolsTable) do
+  defp generate(%PushCommand{array_variable: array_variable, text: text}, ast, symbolsTable) do
     [
       "push ",
       generate(array_variable, ast, symbolsTable),
@@ -182,7 +182,7 @@ defmodule MacroCompiler.CodeGeneration do
     ]
   end
 
-  defp generate(%PopExpression{array_variable: array_variable}, ast, symbolsTable) do
+  defp generate(%PopCommand{array_variable: array_variable}, ast, symbolsTable) do
     [
       "pop ",
       generate(array_variable, ast, symbolsTable),
@@ -190,7 +190,7 @@ defmodule MacroCompiler.CodeGeneration do
     ]
   end
 
-  defp generate(%ShiftExpression{array_variable: array_variable}, ast, symbolsTable) do
+  defp generate(%ShiftCommand{array_variable: array_variable}, ast, symbolsTable) do
     [
       "shift ",
       generate(array_variable, ast, symbolsTable),
@@ -198,7 +198,7 @@ defmodule MacroCompiler.CodeGeneration do
     ]
   end
 
-  defp generate(%UnshiftExpression{array_variable: array_variable, text: text}, ast, symbolsTable) do
+  defp generate(%UnshiftCommand{array_variable: array_variable, text: text}, ast, symbolsTable) do
     [
       "unshift ",
       generate(array_variable, ast, symbolsTable),

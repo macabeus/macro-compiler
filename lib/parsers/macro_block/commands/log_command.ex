@@ -1,7 +1,9 @@
-defmodule MacroCompiler.LogExpression do
+defmodule MacroCompiler.Parser.LogCommand do
   use Combine
   use Combine.Helpers
-  alias MacroCompiler.TextValue
+
+  alias MacroCompiler.Parser.LogCommand
+  alias MacroCompiler.Parser.TextValue
 
   @enforce_keys [:text]
   defstruct [:text]
@@ -16,7 +18,7 @@ defmodule MacroCompiler.LogExpression do
 
         skip(char(?\n))
       ]),
-      fn [text] -> %MacroCompiler.LogExpression{text: text} end
+      fn [text] -> %LogCommand{text: text} end
     )
   end
 end

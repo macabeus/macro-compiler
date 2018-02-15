@@ -1,9 +1,11 @@
-defmodule MacroCompiler.TextValue do
+defmodule MacroCompiler.Parser.TextValue do
   use Combine
   use Combine.Helpers
-  alias MacroCompiler.ScalarVariable
-  alias MacroCompiler.ArrayVariable
-  alias MacroCompiler.HashVariable
+
+  alias MacroCompiler.Parser.TextValue
+  alias MacroCompiler.Parser.ScalarVariable
+  alias MacroCompiler.Parser.ArrayVariable
+  alias MacroCompiler.Parser.HashVariable
 
   @enforce_keys [:values]
   defstruct [:values]
@@ -45,7 +47,7 @@ defmodule MacroCompiler.TextValue do
           get_char(limited)
         ])
       ),
-      fn values -> %MacroCompiler.TextValue{values: values} end
+      fn values -> %TextValue{values: values} end
     )
   end
 end

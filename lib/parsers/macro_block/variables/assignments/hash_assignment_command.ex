@@ -1,9 +1,11 @@
-defmodule MacroCompiler.HashVariableAssignment do
+defmodule MacroCompiler.Parser.HashAssignmentCommand do
   use Combine
   use Combine.Helpers
-  alias MacroCompiler.HashVariable
-  alias MacroCompiler.Identifier
-  alias MacroCompiler.TextValue
+
+  alias MacroCompiler.Parser.HashAssignmentCommand
+  alias MacroCompiler.Parser.HashVariable
+  alias MacroCompiler.Parser.Identifier
+  alias MacroCompiler.Parser.TextValue
 
   @enforce_keys [:hash_variable, :keystexts]
   defstruct [:hash_variable, :keystexts]
@@ -38,7 +40,7 @@ defmodule MacroCompiler.HashVariableAssignment do
 
         skip(char(?\n))
       ]),
-      fn [hash_variable, keystexts] -> %MacroCompiler.HashVariableAssignment{hash_variable: hash_variable, keystexts: keystexts} end
+      fn [hash_variable, keystexts] -> %HashAssignmentCommand{hash_variable: hash_variable, keystexts: keystexts} end
     )
   end
 end

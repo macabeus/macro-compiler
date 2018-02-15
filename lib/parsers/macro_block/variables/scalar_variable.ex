@@ -1,7 +1,9 @@
-defmodule MacroCompiler.ScalarVariable do
+defmodule MacroCompiler.Parser.ScalarVariable do
   use Combine
   use Combine.Helpers
-  alias MacroCompiler.Identifier
+
+  alias MacroCompiler.Parser.ScalarVariable
+  alias MacroCompiler.Parser.Identifier
 
   @enforce_keys [:name, :array_position, :hash_position]
   defstruct [:name, :array_position, :hash_position]
@@ -27,7 +29,7 @@ defmodule MacroCompiler.ScalarVariable do
           )
         )
       ]),
-      fn [name, array_position, hash_position] -> %MacroCompiler.ScalarVariable{name: name, array_position: array_position, hash_position: hash_position} end
+      fn [name, array_position, hash_position] -> %ScalarVariable{name: name, array_position: array_position, hash_position: hash_position} end
     )
   end
 end

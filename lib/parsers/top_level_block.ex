@@ -1,7 +1,8 @@
-defmodule MacroCompiler.TopLevelBlock do
+defmodule MacroCompiler.Parser.TopLevelBlock do
   use Combine
   use Combine.Helpers
-  alias MacroCompiler.Macro
+
+  alias MacroCompiler.Parser.Macro
 
   def parser() do
     many(

@@ -1,7 +1,9 @@
-defmodule MacroCompiler.CallExpression do
+defmodule MacroCompiler.Parser.CallCommand do
   use Combine
   use Combine.Helpers
-  alias MacroCompiler.Identifier
+
+  alias MacroCompiler.Parser.CallCommand
+  alias MacroCompiler.Parser.Identifier
 
   @enforce_keys [:macro, :params]
   defstruct [:macro, :params]
@@ -33,8 +35,8 @@ defmodule MacroCompiler.CallExpression do
 
         skip(char(?\n))
       ]),
-      fn [macro] -> %MacroCompiler.CallExpression{macro: macro, params: []};
-         [macro, params] -> %MacroCompiler.CallExpression{macro: macro, params: params |> Enum.map(&List.to_string/1)} end
+      fn [macro] -> %CallCommand{macro: macro, params: []};
+         [macro, params] -> %CallCommand{macro: macro, params: params |> Enum.map(&List.to_string/1)} end
     )
   end
 end
