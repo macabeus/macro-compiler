@@ -17,7 +17,7 @@ defmodule MacroCompiler.Parser.ScalarVariable do
         option(
           between(
             char("["),
-            integer(),
+            Identifier.parser(),
             char("]")
           )
         ),
