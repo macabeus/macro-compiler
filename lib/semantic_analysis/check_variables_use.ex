@@ -52,10 +52,10 @@ defmodule MacroCompiler.CheckVariablesUse do
   defp find_variables_write(stage) do
     case stage do
       %{variable_write: x} when is_list(x) ->
-        Enum.map(x, &find_variables_read/1)
+        Enum.map(x, &find_variables_write/1)
 
       x when is_list(x) ->
-        Enum.map(x, &find_variables_read/1)
+        Enum.map(x, &find_variables_write/1)
 
       %{variable_write: x} when is_map(x) ->
         find_variables_write(x)
