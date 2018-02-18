@@ -129,10 +129,27 @@ defmodule MacroCompiler.SemanticAnalysis do
     }
   end
 
-  defp validate(%ScalarVariable{name: name, array_position: _array_position, hash_position: _hash_position}, _ast, _symbolsTable) do
-    %{
-      variable_name: "$#{name}"
-    }
+  defp validate(%ScalarVariable{name: name, array_position: array_position, hash_position: hash_position} = x, ast, symbolsTable) do
+    IO.inspect x
+
+    case {array_position, hash_position} do
+      {nil, nil} ->
+        %{
+          variable_name: "$#{name}"
+        }
+
+      {array_position, nil} ->
+        %{
+          variable_name: "@#{name}",
+          variable_read: validate(array_position, ast, symbolsTable)
+        }
+
+      {nil, hash_position} ->
+        %{
+          variable_name: "%#{name}",
+          variable_read: validate(hash_position, ast, symbolsTable)
+        }
+    end
   end
 
   defp validate(%ArrayVariable{name: name}, _ast, _symbolsTable) do
