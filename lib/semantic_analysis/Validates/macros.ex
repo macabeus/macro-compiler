@@ -1,13 +1,13 @@
-defmodule MacroCompiler.CheckMacros do
-  def validate_check_macros(validate_tree) do
+defmodule MacroCompiler.SemanticAnalysis.Validates.Macros do
+  def validate_macros(symbol_table) do
     macros_read =
-      validate_tree
+      symbol_table
       |> Enum.map(&find_macros_read/1)
       |> List.flatten
       |> Enum.reject(&is_nil/1)
 
     macros_write =
-      validate_tree
+      symbol_table
       |> Enum.map(&find_macros_write/1)
       |> Enum.reject(&is_nil/1)
 
@@ -26,7 +26,7 @@ defmodule MacroCompiler.CheckMacros do
       %{macro_write: %{block: block}} ->
         find_macros_read(block)
 
-      %{macro_read: %{name: macro, params: params}} ->
+      %{macro_read: %{name: macro, params: _params}} ->
         macro
 
       _ ->

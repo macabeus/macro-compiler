@@ -3,8 +3,9 @@ defmodule MacroCompiler do
 
   alias MacroCompiler.Parser.TopLevelBlock
   alias MacroCompiler.Parser.SyntaxError
-  alias MacroCompiler.SymbolsTable
+
   alias MacroCompiler.SemanticAnalysis
+
   alias MacroCompiler.CodeGeneration
   alias MacroCompiler.CodeGenerationHeader
 
@@ -13,12 +14,12 @@ defmodule MacroCompiler do
 
     try do
       [ast] = Combine.parse(file, TopLevelBlock.parser())
-      table = SymbolsTable.build(ast)
 
-      SemanticAnalysis.start_validate(ast, table)
+      symbols_table = SemanticAnalysis.build_symbols_table(ast)
+      SemanticAnalysis.run_validates(symbols_table)
 
-      CodeGenerationHeader.generate(ast, ast, table)
-      CodeGeneration.start_generate(ast, ast, table)
+      CodeGenerationHeader.generate(ast, ast, symbols_table)
+      CodeGeneration.start_generate(ast, ast, symbols_table)
 
     rescue
       e in SyntaxError ->

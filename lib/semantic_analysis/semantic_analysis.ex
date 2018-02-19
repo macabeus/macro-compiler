@@ -18,114 +18,115 @@ defmodule MacroCompiler.SemanticAnalysis do
   alias MacroCompiler.Parser.ShiftCommand
   alias MacroCompiler.Parser.UnshiftCommand
 
-  alias MacroCompiler.SemanticAnalysisError
-  import MacroCompiler.CheckVariablesUse
-  import MacroCompiler.CheckMacros
+  import MacroCompiler.SemanticAnalysis.Validates.Variables
+  import MacroCompiler.SemanticAnalysis.Validates.Macros
 
-  def start_validate(ast, table) do
-    validate_tree =
-      validate(ast, ast, table)
-      |> List.flatten
-
-    validate_check_variables_use(validate_tree)
-    validate_check_macros(validate_tree)
+  def build_symbols_table(ast) do
+    symbols_table(ast)
+    |> List.flatten
   end
 
-  defp validate(block, ast, symbolsTable) when is_list(block) do
-    Enum.map(block, &(validate(&1, ast, symbolsTable)))
+  def run_validates(symbols_table) do
+    validate_variables(symbols_table)
+    validate_macros(symbols_table)
   end
 
 
-  defp validate(%Macro{name: name, block: block}, ast, symbolsTable) do
+  defp symbols_table(block) when is_list(block) do
+    Enum.map(block, &symbols_table/1)
+  end
+
+
+  defp symbols_table(%Macro{name: name, block: block}) do
     %{
-      macro_write: %{name: name, block: validate(block, ast, symbolsTable)}
+      macro_write: %{name: name, block: symbols_table(block)}
     }
   end
 
-  defp validate(%CallCommand{macro: macro, params: params}, _ast, symbolsTable) do
+  defp symbols_table(%CallCommand{macro: macro, params: params}) do
     %{
       macro_read: %{name: macro, params: params}
     }
   end
 
-  defp validate(%DoCommand{text: text}, ast, symbolsTable) do
+  defp symbols_table(%DoCommand{text: text}) do
     %{
-      variable_read: validate(text, ast, symbolsTable)
+      variable_read: symbols_table(text)
     }
   end
 
-  defp validate(%LogCommand{text: text}, ast, symbolsTable) do
+  defp symbols_table(%LogCommand{text: text}) do
     %{
-      variable_read: validate(text, ast, symbolsTable)
+      variable_read: symbols_table(text)
     }
   end
 
-  defp validate(%ScalarAssignmentCommand{scalar_variable: scalar_variable, text: text}, ast, symbolsTable) do
+  defp symbols_table(%ScalarAssignmentCommand{scalar_variable: scalar_variable, text: text}) do
     %{
-      variable_write: validate(scalar_variable, ast, symbolsTable),
-      variable_read: validate(text, ast, symbolsTable)
+      variable_write: symbols_table(scalar_variable),
+      variable_read: symbols_table(text)
     }
   end
 
-  defp validate(%ArrayAssignmentCommand{array_variable: array_variable, texts: texts}, ast, symbolsTable) do
+  defp symbols_table(%ArrayAssignmentCommand{array_variable: array_variable, texts: texts}) do
     %{
-      variable_write: validate(array_variable, ast, symbolsTable),
-      variable_read: validate(texts, ast, symbolsTable)
+      variable_write: symbols_table(array_variable),
+      variable_read: symbols_table(texts)
     }
   end
 
-  defp validate(%HashAssignmentCommand{hash_variable: hash_variable, keystexts: keystexts}, ast, symbolsTable) do
+  defp symbols_table(%HashAssignmentCommand{hash_variable: hash_variable, keystexts: keystexts}) do
     %{
-      variable_write: validate(hash_variable, ast, symbolsTable),
-      variable_read: validate(keystexts, ast, symbolsTable)
+      variable_write: symbols_table(hash_variable),
+      variable_read: symbols_table(keystexts)
     }
   end
 
-  defp validate(%UndefCommand{scalar_variable: scalar_variable}, ast, symbolsTable) do
+  defp symbols_table(%UndefCommand{scalar_variable: scalar_variable}) do
     %{
-      variable_write: validate(scalar_variable, ast, symbolsTable)
+      variable_write: symbols_table(scalar_variable)
     }
   end
 
-  defp validate(%IncrementCommand{scalar_variable: scalar_variable}, ast, symbolsTable) do
+  defp symbols_table(%IncrementCommand{scalar_variable: scalar_variable}) do
     %{
-      variable_write: validate(scalar_variable, ast, symbolsTable)
+      variable_write: symbols_table(scalar_variable)
     }
   end
 
-  defp validate(%DecrementCommand{scalar_variable: scalar_variable}, ast, symbolsTable) do
+  defp symbols_table(%DecrementCommand{scalar_variable: scalar_variable}) do
     %{
-      variable_write: validate(scalar_variable, ast, symbolsTable)
+      variable_write: symbols_table(scalar_variable)
     }
   end
 
-  defp validate(%PushCommand{array_variable: array_variable, text: text}, ast, symbolsTable) do
+  defp symbols_table(%PushCommand{array_variable: array_variable, text: text}) do
     %{
-      variable_write: validate(array_variable, ast, symbolsTable),
-      variable_read: validate(text, ast, symbolsTable)
+      variable_write: symbols_table(array_variable),
+      variable_read: symbols_table(text)
     }
   end
 
-  defp validate(%PopCommand{array_variable: array_variable}, ast, symbolsTable) do
+  defp symbols_table(%PopCommand{array_variable: array_variable}) do
     %{
-      variable_read: validate(array_variable, ast, symbolsTable)
+      variable_read: symbols_table(array_variable)
     }
   end
 
-  defp validate(%ShiftCommand{array_variable: array_variable}, ast, symbolsTable) do
+  defp symbols_table(%ShiftCommand{array_variable: array_variable}) do
     %{
-      variable_read: validate(array_variable, ast, symbolsTable)
+      variable_read: symbols_table(array_variable)
     }
   end
 
-  defp validate(%UnshiftCommand{array_variable: array_variable, text: text}, ast, symbolsTable) do
+  defp symbols_table(%UnshiftCommand{array_variable: array_variable, text: text}) do
     %{
-      variable_write: validate(array_variable, ast, symbolsTable),
-      variable_read: validate(text, ast, symbolsTable)
+      variable_write: symbols_table(array_variable),
+      variable_read: symbols_table(text)
     }
   end
 
-  defp validate(%ScalarVariable{name: name, array_position: array_position, hash_position: hash_position} = x, ast, symbolsTable) do
+  defp symbols_table(%ScalarVariable{name: name, array_position: array_position, hash_position: hash_position}) do
     case {array_position, hash_position} do
       {nil, nil} ->
         %{
@@ -135,41 +136,41 @@ defmodule MacroCompiler.SemanticAnalysis do
       {array_position, nil} ->
         %{
           variable_name: "@#{name}",
-          variable_read: validate(array_position, ast, symbolsTable)
+          variable_read: symbols_table(array_position)
         }
 
       {nil, hash_position} ->
         %{
           variable_name: "%#{name}",
-          variable_read: validate(hash_position, ast, symbolsTable)
+          variable_read: symbols_table(hash_position)
         }
     end
   end
 
-  defp validate(%ArrayVariable{name: name}, _ast, _symbolsTable) do
+  defp symbols_table(%ArrayVariable{name: name}) do
     %{
       variable_name: "@#{name}"
     }
   end
 
-  defp validate(%HashVariable{name: name}, _ast, _symbolsTable) do
+  defp symbols_table(%HashVariable{name: name}) do
     %{
       variable_name: "%#{name}"
     }
   end
 
-  defp validate(%TextValue{values: values}, ast, symbolsTable) do
+  defp symbols_table(%TextValue{values: values}) do
     values
     |> Enum.map(&(
       case &1 do
         %ScalarVariable{name: _name, array_position: _array_position, hash_position: _hash_position} ->
-          validate(&1, ast, symbolsTable)
+          symbols_table(&1)
 
         %ArrayVariable{name: _name} ->
-          validate(&1, ast, symbolsTable)
+          symbols_table(&1)
 
         %HashVariable{name: _name} ->
-          validate(&1, ast, symbolsTable)
+          symbols_table(&1)
 
         _ ->
           nil
@@ -177,7 +178,7 @@ defmodule MacroCompiler.SemanticAnalysis do
     )
   end
 
-  defp validate(_undefinedNode, _ast, _symbolsTable) do
+  defp symbols_table(_undefinedNode) do
 
   end
 end
