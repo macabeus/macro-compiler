@@ -1,6 +1,4 @@
 defmodule MacroCompiler.SemanticAnalysis do
-  alias MacroCompiler.MacroSymbolsTable
-
   alias MacroCompiler.Parser.Macro
   alias MacroCompiler.Parser.CallCommand
   alias MacroCompiler.Parser.DoCommand
@@ -22,6 +20,7 @@ defmodule MacroCompiler.SemanticAnalysis do
 
   alias MacroCompiler.SemanticAnalysisError
   import MacroCompiler.CheckVariablesUse
+  import MacroCompiler.CheckMacros
 
   def start_validate(ast, table) do
     validate_tree =
@@ -29,6 +28,7 @@ defmodule MacroCompiler.SemanticAnalysis do
       |> List.flatten
 
     validate_check_variables_use(validate_tree)
+    validate_check_macros(validate_tree)
   end
 
   defp validate(block, ast, symbolsTable) when is_list(block) do
@@ -36,20 +36,16 @@ defmodule MacroCompiler.SemanticAnalysis do
   end
 
 
-  defp validate(%Macro{name: _name, block: block}, ast, symbolsTable) do
-    validate(block, ast, symbolsTable)
+  defp validate(%Macro{name: name, block: block}, ast, symbolsTable) do
+    %{
+      macro_write: %{name: name, block: validate(block, ast, symbolsTable)}
+    }
   end
 
-  defp validate(%CallCommand{macro: macro, params: _params}, _ast, symbolsTable) do
-    macroNameExists = Enum.find(
-      symbolsTable,
-      fn %MacroSymbolsTable{name: ^macro} -> true; _ -> false end
-    )
-
-    if macroNameExists == nil do
-      raise SemanticAnalysisError,
-        message: "'call' expression invalid: macro '#{macro}' doesn't exits!"
-    end
+  defp validate(%CallCommand{macro: macro, params: params}, _ast, symbolsTable) do
+    %{
+      macro_read: %{name: macro, params: params}
+    }
   end
 
   defp validate(%DoCommand{text: text}, ast, symbolsTable) do
@@ -130,8 +126,6 @@ defmodule MacroCompiler.SemanticAnalysis do
   end
 
   defp validate(%ScalarVariable{name: name, array_position: array_position, hash_position: hash_position} = x, ast, symbolsTable) do
-    IO.inspect x
-
     case {array_position, hash_position} do
       {nil, nil} ->
         %{
