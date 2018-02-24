@@ -22,7 +22,7 @@ defmodule MacroCompiler.Parser.MacroBlock do
   def parser() do
     many(
       between(
-        spaces(),
+        skip(spaces()),
         choice([
           DoCommand.parser(),
           LogCommand.parser(),
@@ -39,7 +39,9 @@ defmodule MacroCompiler.Parser.MacroBlock do
           ShiftCommand.parser(),
           UnshiftCommand.parser(),
 
-          SyntaxError.raiseAtPosition(),
+          # If we could not understand the command in this line, and it's not a close-braces,
+          # then it's a syntax error
+          if_not(char(?}), SyntaxError.raiseAtPosition()),
         ]),
         skip(newline())
       )
