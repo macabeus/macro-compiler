@@ -16,6 +16,7 @@ defmodule MacroCompiler.Parser.Identifier do
            ?} -> false;
            ?+ -> false;
            ?- -> false;
+           ?# -> false;
 
            _ -> true
          end

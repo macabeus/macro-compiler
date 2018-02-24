@@ -14,6 +14,7 @@ defmodule MacroCompiler.Parser.TextValue do
     if limited do
       satisfy(char(),
       fn "\n" -> false;
+        "#" -> false;
         "," -> false;
         "(" -> false;
         ")" -> false;
@@ -27,8 +28,9 @@ defmodule MacroCompiler.Parser.TextValue do
     else
       satisfy(char(),
         fn "\n" -> false;
+          "#" -> false;
 
-          _ -> true
+            _ -> true
         end)
     end
   end
@@ -41,6 +43,7 @@ defmodule MacroCompiler.Parser.TextValue do
           string("\\$"),
           string("\\@"),
           string("\\%"),
+          string("\\#"),
           ScalarVariable.parser(),
           ArrayVariable.parser(),
           HashVariable.parser(),

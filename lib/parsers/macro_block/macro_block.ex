@@ -18,12 +18,15 @@ defmodule MacroCompiler.Parser.MacroBlock do
   alias MacroCompiler.Parser.PopCommand
   alias MacroCompiler.Parser.ShiftCommand
   alias MacroCompiler.Parser.UnshiftCommand
+  alias MacroCompiler.Parser.Comment
 
   def parser() do
     many(
       between(
         skip(spaces()),
         choice([
+          ignore(Comment.parser()),
+
           DoCommand.parser(),
           LogCommand.parser(),
           CallCommand.parser(),
