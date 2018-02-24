@@ -14,7 +14,10 @@ defmodule MacroCompiler.SemanticAnalysis.Validates.Macros do
     macros_read
     |> Enum.reject(&Enum.member?(macros_write, &1))
     |> Enum.map(&(
-      IO.puts IO.ANSI.format([:yellow, :bright, "Warning: ", :black, :normal,  "macro ", :red, &1, :black, " is called but never been written"], true)
+      %{
+        type: :warning,
+        message: IO.ANSI.format([:black, :normal,  "macro ", :red, &1, :black, " is called but never been written"])
+      }
     ))
   end
 

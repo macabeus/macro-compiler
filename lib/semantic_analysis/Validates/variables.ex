@@ -15,19 +15,29 @@ defmodule MacroCompiler.SemanticAnalysis.Validates.Variables do
       |> MapSet.delete(nil)
 
 
-    variables_read
-    |> MapSet.difference(variables_write)
-    |> MapSet.to_list
-    |> Enum.map(&(
-      IO.puts IO.ANSI.format([:yellow, :bright, "Warning: ", :black, :normal,  "variable ", :red, &1, :black, " is read but has never been written"], true)
-    ))
+    messages_variables_read =
+      variables_read
+      |> MapSet.difference(variables_write)
+      |> MapSet.to_list
+      |> Enum.map(&(
+        %{
+          type: :warning,
+          message: IO.ANSI.format([:black, :normal,  "variable ", :red, &1, :black, " is read but has never been written"])
+        }
+      ))
 
-    variables_write
-    |> MapSet.difference(variables_read)
-    |> MapSet.to_list
-    |> Enum.map(&(
-      IO.puts IO.ANSI.format([:yellow, :bright, "Warning: ", :black, :normal,  "variable ", :red, &1, :black, " is write but has never read"], true)
-    ))
+    messages_variables_write =
+      variables_write
+      |> MapSet.difference(variables_read)
+      |> MapSet.to_list
+      |> Enum.map(&(
+        %{
+          type: :warning,
+          message: IO.ANSI.format([:black, :normal,  "variable ", :red, &1, :black, " is write but has never read"])
+        }
+      ))
+
+    [messages_variables_read, messages_variables_write]
   end
 
   defp find_variables_read(stage) do
