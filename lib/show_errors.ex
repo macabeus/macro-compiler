@@ -4,6 +4,8 @@ defmodule MacroCompiler.ShowErrors do
   def show(file, %SyntaxError{message: message, line: line, offset: offset}) do
     {line, col} = calc_line_and_column(file, line, offset)
 
+    IO.puts IO.ANSI.format([:red, :bright, "#{message}\n"])
+
     file
     |> String.split("\n")
     |> Enum.with_index(1)
