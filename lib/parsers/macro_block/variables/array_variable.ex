@@ -2,19 +2,22 @@ defmodule MacroCompiler.Parser.ArrayVariable do
   use Combine
   use Combine.Helpers
 
+  import MacroCompiler.Parser
+
   alias MacroCompiler.Parser.ArrayVariable
   alias MacroCompiler.Parser.Identifier
 
   @enforce_keys [:name]
   defstruct [:name]
 
-  def parser() do
-    map(
-      sequence([
-        ignore(string("@")),
-        Identifier.parser()
-      ]),
-      fn [name] -> %ArrayVariable{name: name} end
-    )
+  parser_command do
+    sequence([
+      ignore(string("@")),
+      Identifier.parser()
+    ])
+  end
+
+  def map_command([name]) do
+    %ArrayVariable{name: name}
   end
 end

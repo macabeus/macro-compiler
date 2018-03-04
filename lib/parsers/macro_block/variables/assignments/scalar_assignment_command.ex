@@ -2,6 +2,8 @@ defmodule MacroCompiler.Parser.ScalarAssignmentCommand do
   use Combine
   use Combine.Helpers
 
+  import MacroCompiler.Parser
+
   alias MacroCompiler.Parser.ScalarAssignmentCommand
   alias MacroCompiler.Parser.ScalarVariable
   alias MacroCompiler.Parser.TextValue
@@ -9,18 +11,19 @@ defmodule MacroCompiler.Parser.ScalarAssignmentCommand do
   @enforce_keys [:scalar_variable, :text]
   defstruct [:scalar_variable, :text]
 
-  def parser() do
-    map(
-      sequence([
-        ScalarVariable.parser(),
+  parser_command do
+    sequence([
+      ScalarVariable.parser(),
 
-        skip(spaces()),
-        ignore(string("=")),
-        skip(spaces()),
+      skip(spaces()),
+      ignore(string("=")),
+      skip(spaces()),
 
-        TextValue.parser()
-      ]),
-      fn [scalar_variable, text] -> %ScalarAssignmentCommand{scalar_variable: scalar_variable, text: text} end
-    )
+      TextValue.parser()
+    ])
+  end
+
+  def map_command([scalar_variable, text]) do
+    %ScalarAssignmentCommand{scalar_variable: scalar_variable, text: text}
   end
 end

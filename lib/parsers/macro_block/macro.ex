@@ -2,6 +2,8 @@ defmodule MacroCompiler.Parser.Macro do
   use Combine
   use Combine.Helpers
 
+  import MacroCompiler.Parser
+
   alias MacroCompiler.Parser.Macro
   alias MacroCompiler.Parser.MacroBlock
   alias MacroCompiler.Parser.Identifier
@@ -9,23 +11,24 @@ defmodule MacroCompiler.Parser.Macro do
   @enforce_keys [:name, :block]
   defstruct [:name, :block]
 
-  def parser() do
-    map(
-      sequence([
-        ignore(string("macro")),
-        ignore(spaces()),
+  parser_command do
+    sequence([
+      ignore(string("macro")),
+      ignore(spaces()),
 
-        Identifier.parser(),
+      Identifier.parser(),
 
-        ignore(spaces()),
-        ignore(char("{")),
-        skip(newline()),
+      ignore(spaces()),
+      ignore(char("{")),
+      skip(newline()),
 
-        MacroBlock.parser(),
+      MacroBlock.parser(),
 
-        ignore(char("}"))
-      ]),
-      fn [macro_name, block] -> %Macro{name: macro_name, block: block} end
-    )
+      ignore(char("}"))
+    ])
+  end
+
+  def map_command([macro_name, block]) do
+    %Macro{name: macro_name, block: block}
   end
 end

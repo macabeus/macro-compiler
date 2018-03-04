@@ -2,6 +2,8 @@ defmodule MacroCompiler.Parser.UnshiftCommand do
   use Combine
   use Combine.Helpers
 
+  import MacroCompiler.Parser
+
   alias MacroCompiler.Parser.UnshiftCommand
   alias MacroCompiler.Parser.ArrayVariable
   alias MacroCompiler.Parser.TextValue
@@ -9,24 +11,25 @@ defmodule MacroCompiler.Parser.UnshiftCommand do
   @enforce_keys [:array_variable, :text]
   defstruct [:array_variable, :text]
 
-  def parser() do
-    map(
-      sequence([
-        ignore(string("&unshift(")),
+  parser_command do
+    sequence([
+      ignore(string("&unshift(")),
 
-        ArrayVariable.parser(),
+      ArrayVariable.parser(),
 
-        skip(spaces()),
-        ignore(string(",")),
-        skip(spaces()),
+      skip(spaces()),
+      ignore(string(",")),
+      skip(spaces()),
 
-        TextValue.parser(),
+      TextValue.parser(),
 
-        ignore(string(")")),
+      ignore(string(")")),
 
-        skip(newline())
-      ]),
-      fn [array_variable, text] -> %UnshiftCommand{array_variable: array_variable, text: text} end
-    )
+      skip(newline())
+    ])
+  end
+
+  def map_command([array_variable, text]) do
+    %UnshiftCommand{array_variable: array_variable, text: text}
   end
 end

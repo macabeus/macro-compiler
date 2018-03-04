@@ -2,24 +2,27 @@ defmodule MacroCompiler.Parser.PopCommand do
   use Combine
   use Combine.Helpers
 
+  import MacroCompiler.Parser
+
   alias MacroCompiler.Parser.PopCommand
   alias MacroCompiler.Parser.ArrayVariable
 
   @enforce_keys [:array_variable]
   defstruct [:array_variable]
 
-  def parser() do
-    map(
-      sequence([
-        ignore(string("&pop(")),
+  parser_command do
+    sequence([
+      ignore(string("&pop(")),
 
-        ArrayVariable.parser(),
+      ArrayVariable.parser(),
 
-        ignore(string(")")),
+      ignore(string(")")),
 
-        skip(newline())
-      ]),
-      fn [array_variable] -> %PopCommand{array_variable: array_variable} end
-    )
+      skip(newline())
+    ])
+  end
+
+  def map_command([array_variable]) do
+    %PopCommand{array_variable: array_variable}
   end
 end

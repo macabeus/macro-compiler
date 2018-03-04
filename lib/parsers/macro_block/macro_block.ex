@@ -22,32 +22,39 @@ defmodule MacroCompiler.Parser.MacroBlock do
 
   def parser() do
     many(
-      between(
-        skip(spaces()),
-        choice([
-          ignore(Comment.parser()),
+      map(
+       sequence([
+         between(
+           skip(spaces()),
+           choice([
+             ignore(Comment.parser()),
 
-          DoCommand.parser(),
-          LogCommand.parser(),
-          CallCommand.parser(),
-          UndefCommand.parser(),
-          ScalarAssignmentCommand.parser(),
-          ArrayAssignmentCommand.parser(),
-          HashAssignmentCommand.parser(),
-          IncrementCommand.parser(),
-          DecrementCommand.parser(),
-          PauseCommand.parser(),
-          PushCommand.parser(),
-          PopCommand.parser(),
-          ShiftCommand.parser(),
-          UnshiftCommand.parser(),
+             DoCommand.parser(),
+             LogCommand.parser(),
+             CallCommand.parser(),
+             UndefCommand.parser(),
+             ScalarAssignmentCommand.parser(),
+             ArrayAssignmentCommand.parser(),
+             HashAssignmentCommand.parser(),
+             IncrementCommand.parser(),
+             DecrementCommand.parser(),
+             PauseCommand.parser(),
+             PushCommand.parser(),
+             PopCommand.parser(),
+             ShiftCommand.parser(),
+             UnshiftCommand.parser(),
 
-          # If we could not understand the command in this line, and it's not a close-braces,
-          # then it's a syntax error
-          if_not(char(?}), SyntaxError.raiseAtPosition()),
-        ]),
-        skip(newline())
-      )
+             # If we could not understand the command in this line, and it's not a close-braces,
+             # then it's a syntax error
+             if_not(char(?}), SyntaxError.raiseAtPosition()),
+           ]),
+           skip(newline())
+        ),
+      ]),
+
+      fn [node] ->
+        node
+      end)
     )
   end
 end

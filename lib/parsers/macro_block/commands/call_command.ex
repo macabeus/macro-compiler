@@ -2,41 +2,47 @@ defmodule MacroCompiler.Parser.CallCommand do
   use Combine
   use Combine.Helpers
 
+  import MacroCompiler.Parser
+
   alias MacroCompiler.Parser.CallCommand
   alias MacroCompiler.Parser.Identifier
 
   @enforce_keys [:macro, :params]
   defstruct [:macro, :params]
 
-  def parser() do
-    map(
-      sequence([
-        ignore(string("call")),
-        ignore(spaces()),
+  parser_command do
+    sequence([
+      ignore(string("call")),
+      ignore(spaces()),
 
-        Identifier.parser(),
+      Identifier.parser(),
 
-        either(
-          ignore(char(?\n)),
+      either(
+        ignore(char(?\n)),
 
-          many(
-            between(
-              sequence([
-                spaces(),
-                char(?")
-              ]),
-
-              take_while(fn ?" -> false; _ -> true end),
-
+        many(
+          between(
+            sequence([
+              spaces(),
               char(?")
-            )
-          )
-        ),
+            ]),
 
-        skip(char(?\n))
-      ]),
-      fn [macro] -> %CallCommand{macro: macro, params: []};
-         [macro, params] -> %CallCommand{macro: macro, params: params |> Enum.map(&List.to_string/1)} end
-    )
+            take_while(fn ?" -> false; _ -> true end),
+
+            char(?")
+          )
+        )
+      ),
+
+      skip(char(?\n))
+    ])
+  end
+
+  def map_command([macro]) do
+    %CallCommand{macro: macro, params: []}
+  end
+
+  def map_command([macro, params]) do
+    %CallCommand{macro: macro, params: params |> Enum.map(&List.to_string/1)}
   end
 end

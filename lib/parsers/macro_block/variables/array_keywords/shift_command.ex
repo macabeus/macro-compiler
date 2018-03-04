@@ -2,24 +2,27 @@ defmodule MacroCompiler.Parser.ShiftCommand do
   use Combine
   use Combine.Helpers
 
+  import MacroCompiler.Parser
+
   alias MacroCompiler.Parser.ShiftCommand
   alias MacroCompiler.Parser.ArrayVariable
 
   @enforce_keys [:array_variable]
   defstruct [:array_variable]
 
-  def parser() do
-    map(
-      sequence([
-        ignore(string("&shift(")),
+  parser_command do
+    sequence([
+      ignore(string("&shift(")),
 
-        ArrayVariable.parser(),
+      ArrayVariable.parser(),
 
-        ignore(string(")")),
+      ignore(string(")")),
 
-        skip(newline())
-      ]),
-      fn [array_variable] -> %ShiftCommand{array_variable: array_variable} end
-    )
+      skip(newline())
+    ])
+  end
+
+  def map_command([array_variable]) do
+    %ShiftCommand{array_variable: array_variable}
   end
 end

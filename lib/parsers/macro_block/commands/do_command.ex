@@ -2,21 +2,24 @@ defmodule MacroCompiler.Parser.DoCommand do
   use Combine
   use Combine.Helpers
 
+  import MacroCompiler.Parser
+
   alias MacroCompiler.Parser.DoCommand
   alias MacroCompiler.Parser.TextValue
 
   @enforce_keys [:text]
   defstruct [:text]
 
-  def parser() do
-    map(
-      sequence([
-        ignore(string("do")),
-        skip(space()),
+  parser_command do
+    sequence([
+      ignore(string("do")),
+      skip(space()),
 
-        TextValue.parser(false)
-      ]),
-      fn [text] -> %DoCommand{text: text} end
-    )
+      TextValue.parser(false)
+    ])
+  end
+
+  def map_command([text]) do
+    %DoCommand{text: text}
   end
 end

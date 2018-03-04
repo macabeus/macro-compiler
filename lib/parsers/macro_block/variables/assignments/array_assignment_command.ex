@@ -2,6 +2,8 @@ defmodule MacroCompiler.Parser.ArrayAssignmentCommand do
   use Combine
   use Combine.Helpers
 
+  import MacroCompiler.Parser
+
   alias MacroCompiler.Parser.ArrayAssignmentCommand
   alias MacroCompiler.Parser.ArrayVariable
   alias MacroCompiler.Parser.TextValue
@@ -9,30 +11,31 @@ defmodule MacroCompiler.Parser.ArrayAssignmentCommand do
   @enforce_keys [:array_variable, :texts]
   defstruct [:array_variable, :texts]
 
-  def parser() do
-    map(
-      sequence([
-        ArrayVariable.parser(),
+  parser_command do
+    sequence([
+      ArrayVariable.parser(),
 
-        skip(spaces()),
-        ignore(string("=")),
-        skip(spaces()),
+      skip(spaces()),
+      ignore(string("=")),
+      skip(spaces()),
 
-        ignore(char("(")),
+      ignore(char("(")),
 
-        sep_by(
-          TextValue.parser(),
-          sequence([
-            char(","),
-            skip(spaces())
-          ])
-        ),
+      sep_by(
+        TextValue.parser(),
+        sequence([
+          char(","),
+          skip(spaces())
+        ])
+      ),
 
-        ignore(char(")")),
+      ignore(char(")")),
 
-        skip(char(?\n))
-      ]),
-      fn [scalar_variable, texts] -> %ArrayAssignmentCommand{array_variable: scalar_variable, texts: texts} end
-    )
+      skip(char(?\n))
+    ])
+  end
+
+  def map_command([scalar_variable, texts]) do
+    %ArrayAssignmentCommand{array_variable: scalar_variable, texts: texts}
   end
 end

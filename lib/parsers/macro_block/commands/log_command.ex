@@ -2,23 +2,26 @@ defmodule MacroCompiler.Parser.LogCommand do
   use Combine
   use Combine.Helpers
 
+  import MacroCompiler.Parser
+
   alias MacroCompiler.Parser.LogCommand
   alias MacroCompiler.Parser.TextValue
 
   @enforce_keys [:text]
   defstruct [:text]
 
-  def parser() do
-    map(
-      sequence([
-        ignore(string("log")),
-        ignore(spaces()),
+  parser_command do
+    sequence([
+      ignore(string("log")),
+      ignore(spaces()),
 
-        TextValue.parser(false),
+      TextValue.parser(false),
 
-        skip(char(?\n))
-      ]),
-      fn [text] -> %LogCommand{text: text} end
-    )
+      skip(char(?\n))
+    ])
+  end
+
+  def map_command([text]) do
+    %LogCommand{text: text}
   end
 end
