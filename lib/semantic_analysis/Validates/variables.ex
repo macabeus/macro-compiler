@@ -1,7 +1,5 @@
 defmodule MacroCompiler.SemanticAnalysis.Validates.Variables do
-  alias MacroCompiler.ShowErrors
-
-  def validate_variables(file, symbol_table) do
+  def validate_variables(symbol_table) do
     variables_read =
       symbol_table
       |> Enum.map(&find_variables_read/1)
@@ -37,15 +35,10 @@ defmodule MacroCompiler.SemanticAnalysis.Validates.Variables do
         end
       end)
       |> Enum.map(fn({variable_name, metadatas}) -> %{
-        name: variable_name,
-        occurrences: Enum.map(metadatas, &ShowErrors.calc_line_and_column(file, &1.line, &1.offset)) |> Enum.reverse
+        type: :warning,
+        metadatas: metadatas,
+        message: [:black, :normal,  "variable ", :red, variable_name, :black, " is called but it has never been written."]
       } end)
-      |> Enum.map(fn %{name: variable_name, occurrences: occurrences} ->
-        %{
-          type: :warning,
-          message: IO.ANSI.format([:black, :normal,  "variable ", :red, variable_name, :black, " is read but has never been written. It's happened at #{Enum.map(occurrences, fn {line, column} -> "#{line}:#{column}" end) |> Enum.join(" and ")}"])
-        }
-      end)
 
     messages_variables_write =
       variables_write
@@ -60,15 +53,10 @@ defmodule MacroCompiler.SemanticAnalysis.Validates.Variables do
         end
       end)
       |> Enum.map(fn({variable_name, metadatas}) -> %{
-        name: variable_name,
-        occurrences: Enum.map(metadatas, &ShowErrors.calc_line_and_column(file, &1.line, &1.offset)) |> Enum.reverse
+        type: :warning,
+        metadatas: metadatas,
+        message: [:black, :normal,  "variable ", :red, variable_name, :black, " is write but it has never read."]
       } end)
-      |> Enum.map(fn %{name: variable_name, occurrences: occurrences} ->
-        %{
-          type: :warning,
-          message: IO.ANSI.format([:black, :normal,  "variable ", :red, variable_name, :black, " is write but has never read. It's happened at #{Enum.map(occurrences, fn {line, column} -> "#{line}:#{column}" end) |> Enum.join(" and ")}"])
-        }
-      end)
 
     [messages_variables_read, messages_variables_write]
   end

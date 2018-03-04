@@ -1,7 +1,5 @@
 defmodule MacroCompiler.SemanticAnalysis.Validates.Macros do
-  alias MacroCompiler.ShowErrors
-
-  def validate_macros(file, symbol_table) do
+  def validate_macros(symbol_table) do
     macros_read =
       symbol_table
       |> Enum.map(&find_macros_read/1)
@@ -25,15 +23,10 @@ defmodule MacroCompiler.SemanticAnalysis.Validates.Macros do
       end
     end)
     |> Enum.map(fn({macro_name, metadatas}) -> %{
-      name: macro_name,
-      occurrences: Enum.map(metadatas, &ShowErrors.calc_line_and_column(file, &1.line, &1.offset)) |> Enum.reverse
+      type: :warning,
+      metadatas: metadatas,
+      message: [:black, :normal,  "macro ", :red, macro_name, :black, " is called but it has never been written."]
     } end)
-    |> Enum.map(fn %{name: macro_name, occurrences: occurrences} ->
-      %{
-        type: :warning,
-        message: IO.ANSI.format([:black, :normal,  "macro ", :red, macro_name, :black, " is called but never been written. It's happened at #{Enum.map(occurrences, fn {line, column} -> "#{line}:#{column}" end) |> Enum.join(" and ")}"])
-      }
-    end)
   end
 
   defp find_macros_read(stage) do

@@ -26,22 +26,11 @@ defmodule MacroCompiler.SemanticAnalysis do
     |> List.flatten
   end
 
-  def run_validates(file, symbols_table) do
+  def run_validates(symbols_table) do
     List.flatten([
-      validate_variables(file, symbols_table),
-      validate_macros(file, symbols_table)
+      validate_variables(symbols_table),
+      validate_macros(symbols_table)
     ])
-  end
-
-  def show_validates_result(validates_result) do
-    warning_message_prefix = IO.ANSI.format([:yellow, :bright, "Warning: "])
-
-    validates_result
-    |> Enum.each(&case &1 do
-      %{type: :warning, message: message} ->
-        [warning_message_prefix | message]
-        |> IO.puts
-    end)
   end
 
 
