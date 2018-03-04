@@ -16,7 +16,7 @@ defmodule MacroCompiler do
       [ast] = Combine.parse(file, TopLevelBlock.parser())
 
       symbols_table = SemanticAnalysis.build_symbols_table(ast)
-      validates_result = SemanticAnalysis.run_validates(symbols_table)
+      validates_result = SemanticAnalysis.run_validates(file, symbols_table)
       SemanticAnalysis.show_validates_result(validates_result)
 
       CodeGenerationHeader.generate(ast, ast, symbols_table)

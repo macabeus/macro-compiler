@@ -26,7 +26,7 @@ defmodule MacroCompiler.ShowErrors do
     IO.puts "\n\nMacro couldn't be compiled. Sorry"
   end
 
-  defp calc_line_and_column(file, line, offset) do
+  def calc_line_and_column(file, line, offset) do
     file_lines = file
       |> String.split("\n")
 

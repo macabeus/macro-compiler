@@ -8,10 +8,16 @@ defmodule MacroCompiler.Parser do
     quote do
       def parser() do
         map(
-          unquote(body),
+          sequence([
+            Metadata.getMetadata(),
+            unquote(body)
+          ]),
 
-          fn node ->
-            map_command(node)
+          fn [metadata, node] ->
+            {
+              map_command(node),
+              metadata
+            }
           end
         )
       end

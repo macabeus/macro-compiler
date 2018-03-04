@@ -36,6 +36,9 @@ defmodule MacroCompiler.CodeGenerationHeader do
     """
   end
 
+  defp find_requirements({node, _metadata}, ast, symbolsTable) do
+    find_requirements(node, ast, symbolsTable)
+  end
 
   defp find_requirements(block, ast, symbolsTable) when is_list(block) do
     Enum.map(block, &(find_requirements(&1, ast, symbolsTable)))

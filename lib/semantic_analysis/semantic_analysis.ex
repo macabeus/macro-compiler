@@ -26,10 +26,10 @@ defmodule MacroCompiler.SemanticAnalysis do
     |> List.flatten
   end
 
-  def run_validates(symbols_table) do
+  def run_validates(file, symbols_table) do
     List.flatten([
-      validate_variables(symbols_table),
-      validate_macros(symbols_table)
+      validate_variables(file, symbols_table),
+      validate_macros(file, symbols_table)
     ])
   end
 
@@ -50,125 +50,125 @@ defmodule MacroCompiler.SemanticAnalysis do
   end
 
 
-  defp symbols_table(%Macro{name: name, block: block}) do
+  defp symbols_table({%Macro{name: name, block: block}, _metadata}) do
     %{
       macro_write: %{name: name, block: symbols_table(block)}
     }
   end
 
-  defp symbols_table(%CallCommand{macro: macro, params: params}) do
+  defp symbols_table({%CallCommand{macro: macro, params: params}, metadata}) do
     %{
-      macro_read: %{name: macro, params: params}
+      macro_read: {%{name: macro, params: params}, metadata}
     }
   end
 
-  defp symbols_table(%DoCommand{text: text}) do
-    %{
-      variable_read: symbols_table(text)
-    }
-  end
-
-  defp symbols_table(%LogCommand{text: text}) do
+  defp symbols_table({%DoCommand{text: text}, _metadata}) do
     %{
       variable_read: symbols_table(text)
     }
   end
 
-  defp symbols_table(%ScalarAssignmentCommand{scalar_variable: scalar_variable, text: text}) do
+  defp symbols_table({%LogCommand{text: text}, _metadata}) do
+    %{
+      variable_read: symbols_table(text)
+    }
+  end
+
+  defp symbols_table({%ScalarAssignmentCommand{scalar_variable: scalar_variable, text: text}, _metadata}) do
     %{
       variable_write: symbols_table(scalar_variable),
       variable_read: symbols_table(text)
     }
   end
 
-  defp symbols_table(%ArrayAssignmentCommand{array_variable: array_variable, texts: texts}) do
+  defp symbols_table({%ArrayAssignmentCommand{array_variable: array_variable, texts: texts}, _metadata}) do
     %{
       variable_write: symbols_table(array_variable),
       variable_read: symbols_table(texts)
     }
   end
 
-  defp symbols_table(%HashAssignmentCommand{hash_variable: hash_variable, keystexts: keystexts}) do
+  defp symbols_table({%HashAssignmentCommand{hash_variable: hash_variable, keystexts: keystexts}, _metadata}) do
     %{
       variable_write: symbols_table(hash_variable),
       variable_read: symbols_table(keystexts)
     }
   end
 
-  defp symbols_table(%UndefCommand{scalar_variable: scalar_variable}) do
+  defp symbols_table({%UndefCommand{scalar_variable: scalar_variable}, _metadata}) do
     %{
       variable_write: symbols_table(scalar_variable)
     }
   end
 
-  defp symbols_table(%IncrementCommand{scalar_variable: scalar_variable}) do
+  defp symbols_table({%IncrementCommand{scalar_variable: scalar_variable}, _metadata}) do
     %{
       variable_write: symbols_table(scalar_variable)
     }
   end
 
-  defp symbols_table(%DecrementCommand{scalar_variable: scalar_variable}) do
+  defp symbols_table({%DecrementCommand{scalar_variable: scalar_variable}, _metadata}) do
     %{
       variable_write: symbols_table(scalar_variable)
     }
   end
 
-  defp symbols_table(%PushCommand{array_variable: array_variable, text: text}) do
+  defp symbols_table({%PushCommand{array_variable: array_variable, text: text}, _metadata}) do
     %{
       variable_write: symbols_table(array_variable),
       variable_read: symbols_table(text)
     }
   end
 
-  defp symbols_table(%PopCommand{array_variable: array_variable}) do
+  defp symbols_table({%PopCommand{array_variable: array_variable}, _metadata}) do
     %{
       variable_read: symbols_table(array_variable)
     }
   end
 
-  defp symbols_table(%ShiftCommand{array_variable: array_variable}) do
+  defp symbols_table({%ShiftCommand{array_variable: array_variable}, _metadata}) do
     %{
       variable_read: symbols_table(array_variable)
     }
   end
 
-  defp symbols_table(%UnshiftCommand{array_variable: array_variable, text: text}) do
+  defp symbols_table({%UnshiftCommand{array_variable: array_variable, text: text}, _metadata}) do
     %{
       variable_write: symbols_table(array_variable),
       variable_read: symbols_table(text)
     }
   end
 
-  defp symbols_table(%ScalarVariable{name: name, array_position: array_position, hash_position: hash_position}) do
+  defp symbols_table({%ScalarVariable{name: name, array_position: array_position, hash_position: hash_position}, metadata}) do
     case {array_position, hash_position} do
       {nil, nil} ->
         %{
-          variable_name: "$#{name}"
+          variable_name: {"$#{name}", metadata}
         }
 
       {array_position, nil} ->
         %{
-          variable_name: "@#{name}",
+          variable_name: {"@#{name}", metadata},
           variable_read: symbols_table(array_position)
         }
 
       {nil, hash_position} ->
         %{
-          variable_name: "%#{name}",
+          variable_name: {"%#{name}", metadata},
           variable_read: symbols_table(hash_position)
         }
     end
   end
 
-  defp symbols_table(%ArrayVariable{name: name}) do
+  defp symbols_table({%ArrayVariable{name: name}, metadata}) do
     %{
-      variable_name: "@#{name}"
+      variable_name: {"@#{name}", metadata}
     }
   end
 
-  defp symbols_table(%HashVariable{name: name}) do
+  defp symbols_table({%HashVariable{name: name}, metadata}) do
     %{
-      variable_name: "%#{name}"
+      variable_name: {"%#{name}", metadata}
     }
   end
 
@@ -176,13 +176,13 @@ defmodule MacroCompiler.SemanticAnalysis do
     values
     |> Enum.map(&(
       case &1 do
-        %ScalarVariable{name: _name, array_position: _array_position, hash_position: _hash_position} ->
+        {%ScalarVariable{name: _name, array_position: _array_position, hash_position: _hash_position}, _metadata} ->
           symbols_table(&1)
 
-        %ArrayVariable{name: _name} ->
+        {%ArrayVariable{name: _name}, _metadata} ->
           symbols_table(&1)
 
-        %HashVariable{name: _name} ->
+        {%HashVariable{name: _name}, _metadata} ->
           symbols_table(&1)
 
         _ ->

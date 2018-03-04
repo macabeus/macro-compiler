@@ -1,41 +1,74 @@
 defmodule MacroCompiler.SemanticAnalysis.Validates.Variables do
-  def validate_variables(symbol_table) do
+  alias MacroCompiler.ShowErrors
+
+  def validate_variables(file, symbol_table) do
     variables_read =
       symbol_table
       |> Enum.map(&find_variables_read/1)
       |> List.flatten
-      |> MapSet.new
-      |> MapSet.delete(nil)
+      |> Enum.reject(&is_nil/1)
+
+    variables_read_names =
+      variables_read
+      |> Enum.map(&Map.get(&1, :name))
+
 
     variables_write =
       symbol_table
       |> Enum.map(&find_variables_write/1)
       |> List.flatten
-      |> MapSet.new
-      |> MapSet.delete(nil)
+      |> Enum.reject(&is_nil/1)
+
+    variables_write_names =
+      variables_write
+      |> Enum.map(&Map.get(&1, :name))
 
 
     messages_variables_read =
       variables_read
-      |> MapSet.difference(variables_write)
-      |> MapSet.to_list
-      |> Enum.map(&(
+      |> Enum.reject(&Enum.member?(variables_write_names, &1.name))
+      |> Enum.reduce(%{}, fn(variable, acc) ->
+        case Map.fetch(acc, variable.name) do
+          {:ok, metadatas} ->
+            %{acc | variable.name => [variable.metadata | metadatas]}
+
+          :error ->
+            Map.put(acc, variable.name, [variable.metadata])
+        end
+      end)
+      |> Enum.map(fn({variable_name, metadatas}) -> %{
+        name: variable_name,
+        occurrences: Enum.map(metadatas, &ShowErrors.calc_line_and_column(file, &1.line, &1.offset)) |> Enum.reverse
+      } end)
+      |> Enum.map(fn %{name: variable_name, occurrences: occurrences} ->
         %{
           type: :warning,
-          message: IO.ANSI.format([:black, :normal,  "variable ", :red, &1, :black, " is read but has never been written"])
+          message: IO.ANSI.format([:black, :normal,  "variable ", :red, variable_name, :black, " is read but has never been written. It's happened at #{Enum.map(occurrences, fn {line, column} -> "#{line}:#{column}" end) |> Enum.join(" and ")}"])
         }
-      ))
+      end)
 
     messages_variables_write =
       variables_write
-      |> MapSet.difference(variables_read)
-      |> MapSet.to_list
-      |> Enum.map(&(
+      |> Enum.reject(&Enum.member?(variables_read_names, &1.name))
+      |> Enum.reduce(%{}, fn(variable, acc) ->
+        case Map.fetch(acc, variable.name) do
+          {:ok, metadatas} ->
+            %{acc | variable.name => [variable.metadata | metadatas]}
+
+          :error ->
+            Map.put(acc, variable.name, [variable.metadata])
+        end
+      end)
+      |> Enum.map(fn({variable_name, metadatas}) -> %{
+        name: variable_name,
+        occurrences: Enum.map(metadatas, &ShowErrors.calc_line_and_column(file, &1.line, &1.offset)) |> Enum.reverse
+      } end)
+      |> Enum.map(fn %{name: variable_name, occurrences: occurrences} ->
         %{
           type: :warning,
-          message: IO.ANSI.format([:black, :normal,  "variable ", :red, &1, :black, " is write but has never read"])
+          message: IO.ANSI.format([:black, :normal,  "variable ", :red, variable_name, :black, " is write but has never read. It's happened at #{Enum.map(occurrences, fn {line, column} -> "#{line}:#{column}" end) |> Enum.join(" and ")}"])
         }
-      ))
+      end)
 
     [messages_variables_read, messages_variables_write]
   end
@@ -54,8 +87,8 @@ defmodule MacroCompiler.SemanticAnalysis.Validates.Variables do
       %{variable_read: x} when is_map(x) ->
         find_variables_read(x)
 
-      %{variable_name: x} ->
-        x
+      %{variable_name: {name, metadata}} ->
+        %{name: name, metadata: metadata}
 
       _ ->
         nil
@@ -76,8 +109,8 @@ defmodule MacroCompiler.SemanticAnalysis.Validates.Variables do
       %{variable_write: x} when is_map(x) ->
         find_variables_write(x)
 
-      %{variable_name: x} ->
-        x
+      %{variable_name: {name, metadata}} ->
+        %{name: name, metadata: metadata}
 
       _ ->
         nil

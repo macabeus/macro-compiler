@@ -25,6 +25,10 @@ defmodule MacroCompiler.CodeGeneration do
     |> Enum.map(&IO.puts/1)
   end
 
+  defp generate({node, _metadata}, ast, symbolsTable) do
+    generate(node, ast, symbolsTable)
+  end
+
   defp generate(block, ast, symbolsTable) when is_list(block) do
     Enum.map(block, &(generate(&1, ast, symbolsTable)))
   end
@@ -42,13 +46,13 @@ defmodule MacroCompiler.CodeGeneration do
     values = values
     |> Enum.map(&(
       case &1 do
-        %ScalarVariable{name: _name, array_position: _array_position, hash_position: _hash_position} ->
+        {%ScalarVariable{name: _name, array_position: _array_position, hash_position: _hash_position}, _metadata} ->
           generate(&1, ast, symbolsTable)
 
-        %ArrayVariable{name: name} ->
+        {%ArrayVariable{name: name}, _metadata} ->
           "\".scalar(@#{name}).\""
 
-        %HashVariable{name: name} ->
+        {%HashVariable{name: name}, _metadata} ->
           "\".scalar(keys %#{name}).\""
 
         "\"" ->
