@@ -17,6 +17,7 @@ defmodule MacroCompiler.SemanticAnalysis do
   alias MacroCompiler.Parser.TextValue
   alias MacroCompiler.Parser.ShiftCommand
   alias MacroCompiler.Parser.UnshiftCommand
+  alias MacroCompiler.Parser.DeleteCommand
 
   import MacroCompiler.SemanticAnalysis.Validates.Variables
   import MacroCompiler.SemanticAnalysis.Validates.Macros
@@ -158,6 +159,12 @@ defmodule MacroCompiler.SemanticAnalysis do
   defp symbols_table({%HashVariable{name: name}, metadata}) do
     %{
       variable_name: {"%#{name}", metadata}
+    }
+  end
+
+  defp symbols_table({%DeleteCommand{scalar_variable: scalar_variable}, _metadata}) do
+    %{
+      variable_write: symbols_table(scalar_variable)
     }
   end
 
