@@ -15,6 +15,7 @@ defmodule MacroCompiler.CodeGenerationHeader do
   alias MacroCompiler.Parser.PopCommand
   alias MacroCompiler.Parser.ShiftCommand
   alias MacroCompiler.Parser.UnshiftCommand
+  alias MacroCompiler.Parser.DeleteCommand
 
   def generate(node, ast, symbolsTable) do
     IO.puts "package macroCompiled;"
@@ -68,6 +69,10 @@ defmodule MacroCompiler.CodeGenerationHeader do
     find_requirements(hash_variable, ast, symbolsTable)
   end
 
+  defp find_requirements(%DeleteCommand{scalar_variable: scalar_variable}, ast, symbolsTable) do
+    find_requirements(scalar_variable, ast, symbolsTable)
+  end
+
   defp find_requirements(%UndefCommand{scalar_variable: scalar_variable}, ast, symbolsTable) do
     find_requirements(scalar_variable, ast, symbolsTable)
   end
@@ -96,8 +101,14 @@ defmodule MacroCompiler.CodeGenerationHeader do
     find_requirements(array_variable, ast, symbolsTable)
   end
 
-  defp find_requirements(%ScalarVariable{name: name, array_position: nil, hash_position: nil}, _ast, _symbolsTable) do
-    %{variable: "$#{name}"}
+  defp find_requirements(%ScalarVariable{name: name, array_position: nil, hash_position: hash_position}, _ast, _symbolsTable) do
+    case {name, hash_position} do
+      {name, nil} ->
+        %{variable: "$#{name}"}
+
+      {name, hash_position} ->
+        %{variable: "%#{name}"}
+    end
   end
 
   defp find_requirements(%ArrayVariable{name: name}, _ast, _symbolsTable) do

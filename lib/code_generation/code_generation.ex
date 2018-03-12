@@ -18,6 +18,7 @@ defmodule MacroCompiler.CodeGeneration do
   alias MacroCompiler.Parser.TextValue
   alias MacroCompiler.Parser.ShiftCommand
   alias MacroCompiler.Parser.UnshiftCommand
+  alias MacroCompiler.Parser.DeleteCommand
 
   def start_generate(block, ast, symbolsTable) do
     Enum.map(block, &(generate(&1, ast, symbolsTable)))
@@ -143,6 +144,14 @@ defmodule MacroCompiler.CodeGeneration do
     [
       generate(hash_variable, ast, symbolsTable),
       " = (#{keystexts});"
+    ]
+  end
+
+  defp generate(%DeleteCommand{scalar_variable: scalar_variable}, ast, symbolsTable) do
+    [
+      "delete ",
+      generate(scalar_variable, ast, symbolsTable),
+      ";"
     ]
   end
 
