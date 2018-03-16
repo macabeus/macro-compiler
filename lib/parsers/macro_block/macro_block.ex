@@ -20,6 +20,7 @@ defmodule MacroCompiler.Parser.MacroBlock do
   alias MacroCompiler.Parser.UnshiftCommand
   alias MacroCompiler.Parser.Comment
   alias MacroCompiler.Parser.DeleteCommand
+  alias MacroCompiler.Parser.KeysCommand
 
   def parser() do
     many(
@@ -45,6 +46,7 @@ defmodule MacroCompiler.Parser.MacroBlock do
              ShiftCommand.parser(),
              UnshiftCommand.parser(),
              DeleteCommand.parser(),
+             KeysCommand.parser(),
 
              # If we could not understand the command in this line, and it's not a close-braces,
              # then it's a syntax error
