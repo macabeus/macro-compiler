@@ -16,6 +16,7 @@ defmodule MacroCompiler.CodeGenerationHeader do
   alias MacroCompiler.Parser.ShiftCommand
   alias MacroCompiler.Parser.UnshiftCommand
   alias MacroCompiler.Parser.DeleteCommand
+  alias MacroCompiler.Parser.KeysCommand
 
   def generate(node, ast, symbolsTable) do
     IO.puts "package macroCompiled;"
@@ -71,6 +72,13 @@ defmodule MacroCompiler.CodeGenerationHeader do
 
   defp find_requirements(%DeleteCommand{scalar_variable: scalar_variable}, ast, symbolsTable) do
     find_requirements(scalar_variable, ast, symbolsTable)
+  end
+
+  defp find_requirements(%KeysCommand{array_variable: array_variable, param_hash_variable: param_hash_variable}, ast, symbolsTable) do
+    [
+      find_requirements(array_variable, ast, symbolsTable),
+      find_requirements(param_hash_variable, ast, symbolsTable)
+    ]
   end
 
   defp find_requirements(%UndefCommand{scalar_variable: scalar_variable}, ast, symbolsTable) do
