@@ -57,9 +57,10 @@ defmodule MacroCompiler.Parser.MacroBlock do
          skip(BlankSpaces.parser())
      ]),
 
-      fn [node] ->
-        node
-      end)
+     fn
+       [node] -> node
+       [] -> nil
+     end)
     )
   end
 end
