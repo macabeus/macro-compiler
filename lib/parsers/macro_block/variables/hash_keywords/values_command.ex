@@ -22,9 +22,7 @@ defmodule MacroCompiler.Parser.ValuesCommand do
 
       HashVariable.parser(),
 
-      ignore(string(")")),
-
-      skip(newline())
+      ignore(string(")"))
     ])
   end
 

@@ -23,9 +23,7 @@ defmodule MacroCompiler.Parser.PushCommand do
 
       TextValue.parser(),
 
-      ignore(string(")")),
-
-      skip(newline())
+      ignore(string(")"))
     ])
   end
 

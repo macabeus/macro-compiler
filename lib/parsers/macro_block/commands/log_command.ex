@@ -15,9 +15,7 @@ defmodule MacroCompiler.Parser.LogCommand do
       ignore(string("log")),
       ignore(spaces()),
 
-      TextValue.parser(false),
-
-      skip(char(?\n))
+      TextValue.parser(false)
     ])
   end
 

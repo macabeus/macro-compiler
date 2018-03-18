@@ -16,9 +16,7 @@ defmodule MacroCompiler.Parser.ShiftCommand do
 
       ArrayVariable.parser(),
 
-      ignore(string(")")),
-
-      skip(newline())
+      ignore(string(")"))
     ])
   end
 

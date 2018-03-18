@@ -29,9 +29,7 @@ defmodule MacroCompiler.Parser.ArrayAssignmentCommand do
         ])
       ),
 
-      ignore(char(")")),
-
-      skip(char(?\n))
+      ignore(char(")"))
     ])
   end
 

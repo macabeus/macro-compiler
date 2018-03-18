@@ -32,9 +32,7 @@ defmodule MacroCompiler.Parser.CallCommand do
             char(?")
           )
         )
-      ),
-
-      skip(char(?\n))
+      )
     ])
   end
 

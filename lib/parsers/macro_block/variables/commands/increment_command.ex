@@ -14,9 +14,7 @@ defmodule MacroCompiler.Parser.IncrementCommand do
     sequence([
       ScalarVariable.parser(),
 
-      ignore(string("++")),
-
-      skip(newline())
+      ignore(string("++"))
     ])
   end
 

@@ -17,8 +17,7 @@ defmodule MacroCompiler.Parser.PauseCommand do
       option(either(
         float(),
         integer()
-      )),
-      skip(char(?\n))
+      ))
     ])
   end
 

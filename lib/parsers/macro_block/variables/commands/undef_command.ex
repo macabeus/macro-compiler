@@ -21,9 +21,7 @@ defmodule MacroCompiler.Parser.UndefCommand do
       ignore(choice([
         string("undef"),
         string("unset")
-      ])),
-
-      ignore(char(?\n))
+      ]))
     ])
   end
 

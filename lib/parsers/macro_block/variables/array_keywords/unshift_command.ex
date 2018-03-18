@@ -23,9 +23,7 @@ defmodule MacroCompiler.Parser.UnshiftCommand do
 
       TextValue.parser(),
 
-      ignore(string(")")),
-
-      skip(newline())
+      ignore(string(")"))
     ])
   end
 

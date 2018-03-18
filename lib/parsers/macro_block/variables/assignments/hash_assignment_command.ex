@@ -37,9 +37,7 @@ defmodule MacroCompiler.Parser.HashAssignmentCommand do
         ])
       ),
 
-      ignore(char(")")),
-
-      skip(char(?\n))
+      ignore(char(")"))
     ])
   end
 

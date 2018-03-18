@@ -15,9 +15,7 @@ defmodule MacroCompiler.Parser.DeleteCommand do
 
       ScalarVariable.parser(),
 
-      ignore(string(")")),
-
-      skip(newline())
+      ignore(string(")"))
     ])
   end
 
