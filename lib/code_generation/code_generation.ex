@@ -112,11 +112,11 @@ defmodule MacroCompiler.CodeGeneration do
     end
   end
 
-  defp generate(%ScalarAssignmentCommand{scalar_variable: scalar_variable, text: text}, ast, symbolsTable) do
+  defp generate(%ScalarAssignmentCommand{scalar_variable: scalar_variable, scalar_value: scalar_value}, ast, symbolsTable) do
     [
       generate(scalar_variable, ast, symbolsTable),
       " = ",
-      generate(text, ast, symbolsTable),
+      generate(scalar_value, ast, symbolsTable),
       ";"
     ]
   end

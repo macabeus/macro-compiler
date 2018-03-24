@@ -70,10 +70,10 @@ defmodule MacroCompiler.SemanticAnalysis do
     }
   end
 
-  defp symbols_table({%ScalarAssignmentCommand{scalar_variable: scalar_variable, text: text}, _metadata}) do
+  defp symbols_table({%ScalarAssignmentCommand{scalar_variable: scalar_variable, scalar_value: scalar_value}, _metadata}) do
     %{
       variable_write: symbols_table(scalar_variable),
-      variable_read: symbols_table(text)
+      variable_read: symbols_table(scalar_value)
     }
   end
 

@@ -63,7 +63,7 @@ defmodule MacroCompiler.CodeGenerationHeader do
     %{module: "Log qw(message)"}
   end
 
-  defp find_requirements(%ScalarAssignmentCommand{scalar_variable: scalar_variable, text: _text}, ast, symbolsTable) do
+  defp find_requirements(%ScalarAssignmentCommand{scalar_variable: scalar_variable, scalar_value: _scalar_value}, ast, symbolsTable) do
     find_requirements(scalar_variable, ast, symbolsTable)
   end
 
