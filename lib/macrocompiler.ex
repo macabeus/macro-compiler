@@ -8,6 +8,8 @@ defmodule MacroCompiler do
 
   alias MacroCompiler.Error.ShowErrors
 
+  alias MacroCompiler.Optimization
+
   alias MacroCompiler.CodeGeneration
   alias MacroCompiler.CodeGenerationHeader
 
@@ -21,8 +23,10 @@ defmodule MacroCompiler do
       validates_result = SemanticAnalysis.run_validates(symbols_table)
       ShowErrors.show(file, validates_result)
 
-      CodeGenerationHeader.generate(ast, ast, symbols_table)
-      CodeGeneration.start_generate(ast, ast, symbols_table)
+      optimized_ast = Optimization.build_ast_otimatized(ast)
+
+      CodeGenerationHeader.generate(optimized_ast, optimized_ast, symbols_table)
+      CodeGeneration.start_generate(optimized_ast, optimized_ast, symbols_table)
 
     rescue
       e in SyntaxError ->

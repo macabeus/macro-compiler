@@ -6,7 +6,7 @@ defmodule MacroCompiler.Parser.Metadata do
   alias MacroCompiler.Parser.Metadata
 
   @enforce_keys [:line, :offset]
-  defstruct [:line, :offset]
+  defstruct [:line, :offset, :ignore]
 
   defparser getMetadata(%ParserState{status: :ok, line: line, column: col, results: results} = state) do
     %{state | :results => [%Metadata{line: line, offset: col} | results]}

@@ -41,6 +41,10 @@ defmodule MacroCompiler.SemanticAnalysis do
     Enum.map(block, &symbols_table/1)
   end
 
+  defp symbols_table({_node, %{ignore: true}}) do
+
+  end
+
 
   defp symbols_table({%Macro{name: name, block: block}, _metadata}) do
     %{

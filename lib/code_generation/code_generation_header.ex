@@ -39,6 +39,10 @@ defmodule MacroCompiler.CodeGenerationHeader do
     """
   end
 
+  defp find_requirements({_node, %{ignore: true}}, ast, symbolsTable) do
+
+  end
+
   defp find_requirements({node, _metadata}, ast, symbolsTable) do
     find_requirements(node, ast, symbolsTable)
   end

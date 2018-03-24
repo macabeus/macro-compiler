@@ -28,6 +28,10 @@ defmodule MacroCompiler.CodeGeneration do
     |> Enum.map(&IO.puts/1)
   end
 
+  defp generate({_node, %{ignore: true}}, ast, symbolsTable) do
+
+  end
+
   defp generate({node, _metadata}, ast, symbolsTable) do
     generate(node, ast, symbolsTable)
   end
