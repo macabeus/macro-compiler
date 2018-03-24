@@ -21,6 +21,7 @@ defmodule MacroCompiler.CodeGeneration do
   alias MacroCompiler.Parser.DeleteCommand
   alias MacroCompiler.Parser.KeysCommand
   alias MacroCompiler.Parser.ValuesCommand
+  alias MacroCompiler.Parser.RandCommand
 
   def start_generate(block, ast, symbolsTable) do
     Enum.map(block, &(generate(&1, ast, symbolsTable)))
@@ -242,6 +243,18 @@ defmodule MacroCompiler.CodeGeneration do
       ",",
       generate(text, ast, symbolsTable),
       ";"
+    ]
+  end
+
+  defp generate(%RandCommand{min: min, max: max}, ast, symbolsTable) do
+    [
+      "(",
+      generate(min, ast, symbolsTable),
+      " + int(rand(1 + ",
+      generate(max, ast, symbolsTable),
+      " - ",
+      generate(min, ast, symbolsTable),
+      ")))"
     ]
   end
 

@@ -20,6 +20,7 @@ defmodule MacroCompiler.SemanticAnalysis do
   alias MacroCompiler.Parser.DeleteCommand
   alias MacroCompiler.Parser.KeysCommand
   alias MacroCompiler.Parser.ValuesCommand
+  alias MacroCompiler.Parser.RandCommand
 
   import MacroCompiler.SemanticAnalysis.Validates.Variables
   import MacroCompiler.SemanticAnalysis.Validates.Macros
@@ -205,6 +206,15 @@ defmodule MacroCompiler.SemanticAnalysis do
           nil
       end)
     )
+  end
+
+  defp symbols_table({%RandCommand{min: min, max: max}, _metadata}) do
+    [min, max]
+    |> Enum.map(&(
+      %{
+        variable_read: symbols_table(&1)
+      }
+    ))
   end
 
   defp symbols_table(_undefinedNode) do
