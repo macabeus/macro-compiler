@@ -54,8 +54,15 @@ defmodule MacroCompiler.CodeGeneration do
     values = values
     |> Enum.map(&(
       case &1 do
-        {%ScalarVariable{name: _name, array_position: _array_position, hash_position: _hash_position}, _metadata} ->
+        {%ScalarVariable{array_position: nil}, _metadata} ->
           generate(&1, symbolsTable)
+
+        {%ScalarVariable{array_position: array_position}, _metadata} ->
+          [
+            "\".",
+            generate(&1, symbolsTable),
+            ".\""
+          ]
 
         {%ArrayVariable{name: name}, _metadata} ->
           "\".scalar(@#{name}).\""
