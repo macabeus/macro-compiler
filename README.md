@@ -17,6 +17,8 @@ Using the EventMacro you can configure the bot to complete quests or to buy iten
 
 >Hey! Warning: This project is under construction, then it's incomplete and it only has a tiny subset of EventMacro commands.
 
+>You can follow the MacroCompiler development [on this post](http://openkorebrasil.org/index.php?/topic/4457-projeto-macro-compiler-compilador-do-eventmacro/) (in Portuguese)
+
 # Example
 
 The macro
