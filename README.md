@@ -61,3 +61,41 @@ To compile your macro, you need to run this command:
 ```
 mix run lib/macrocompiler.ex path/of/eventMacro.txt > macro.pl
 ````
+
+# How does it work?
+
+Since this is a project for studying purposes, I'll explain how I created it, including its logic and design.
+
+## Language design
+
+I **haven't** designed EventMacro: its spec's been already made by other people, and my compiler just needs to keep interoperability. A few important things that have influenced EventMacro design are:
+
+- Perl inspiration; given the fact that OpenKore is written in Perl and many people that work on OpenKore project also write macros;
+- The syntax was designed in order to make it easy to write a regexp-based interpreter;
+- It was designed aiming to ease non-programmers' learning process.
+
+> Designing a programming language and a compiler are processes that have very different focuses, but many tasks in common. [You can read more about it here.](https://www.quora.com/Which-is-the-difference-between-design-a-programming-language-and-design-a-compiler/answer/Quildreen-Motta)
+
+## Parser
+
+I decided to write the parser using a parser combinator-based strategy because Elixir already has an awesome library for doing so: [Combine](https://github.com/bitwalker/combine). In this phase, the parser maps the source code on a representation called AST - Abstract Syntax Tree. We only have this intermediary representation through the whole compiler.
+
+An advantage of parser combinator is that we get the AST directly, but a disadvantage is that we'll have poor error messages.
+
+On my compiler, each node on the AST is a tuple with two elements, where the first element is the struct representing the mapped code and the second one is its metadata. The metadata is important to return a meaningful error message on the next phases (e.g. to tell the coder the line and column where the error happened). Another situation where the metadata is important is on the optimization phase - I'll provide more details about it bellow.
+
+## Semantic analysis
+
+The AST built on the previous phase is passed to the semantic analyzer. It builds a data structure called symbol table, which describes the names used on the code (function and variable names, for example). We could describe the arity of a function, for example.
+
+The aim of semantic analysis is to check whether the code is semantically valid or not, and it uses the symbol table to do so. For example, it checks if there are any variables that are being used but which have never been written.
+
+## Optimization
+
+The optimizer uses both the AST and the symbol table in order to create an equivalent AST, but that results in a faster and smaller code. For example, an optimization implemented in MacroCompiler is [dead code elimination](https://en.wikipedia.org/wiki/Dead_code_elimination). A variable that is written but never called is useless so the optimizer finds these situations and tells the node's metadata to ignore this node on code generation phase.
+
+## Code generation
+
+Using the AST, we could map it to another language. In our context, an OpenKore plugin - that is, a Perl code. Since the EventMacro language and Perl are very similar, it's easy to do this mapping.
+
+We have two phases of code generation: header and body. On the header we find global requirements to declare on top of file - for example, variables declarations, because on EventMacro all variables are globals–but the same doesn't happen on Perl. On the body we generate the code itself.
