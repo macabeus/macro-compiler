@@ -6,8 +6,7 @@ defmodule MacroCompiler.Parser.ScalarAssignmentCommand do
 
   alias MacroCompiler.Parser.ScalarAssignmentCommand
   alias MacroCompiler.Parser.ScalarVariable
-  alias MacroCompiler.Parser.TextValue
-  alias MacroCompiler.Parser.RandCommand
+  alias MacroCompiler.Parser.ScalarValue
 
   @enforce_keys [:scalar_variable, :scalar_value]
   defstruct [:scalar_variable, :scalar_value]
@@ -20,11 +19,7 @@ defmodule MacroCompiler.Parser.ScalarAssignmentCommand do
       ignore(string("=")),
       skip(spaces()),
 
-      choice([
-        ScalarVariable.parser(),
-        RandCommand.parser(),
-        TextValue.parser()
-      ])
+      ScalarValue.parser()
     ])
   end
 

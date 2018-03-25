@@ -7,9 +7,7 @@ defmodule MacroCompiler.Parser.ScalarVariable do
 
   alias MacroCompiler.Parser.ScalarVariable
   alias MacroCompiler.Parser.Identifier
-  alias MacroCompiler.Parser.RandCommand
-
-  alias Combine.ParserState
+  alias MacroCompiler.Parser.ScalarValue
 
   @enforce_keys [:name, :array_position, :hash_position]
   defstruct [:name, :array_position, :hash_position]
@@ -22,11 +20,7 @@ defmodule MacroCompiler.Parser.ScalarVariable do
       option(
         between(
           char("["),
-          choice([
-            lazy(ScalarVariable.parser()),
-            lazy(RandCommand.parser()),
-            integer()
-          ]),
+          ScalarValue.parser(),
           char("]")
         )
       ),

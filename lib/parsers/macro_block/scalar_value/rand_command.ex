@@ -5,8 +5,7 @@ defmodule MacroCompiler.Parser.RandCommand do
   import MacroCompiler.Parser
 
   alias MacroCompiler.Parser.RandCommand
-  alias MacroCompiler.Parser.TextValue
-  alias MacroCompiler.Parser.ScalarVariable
+  alias MacroCompiler.Parser.ScalarValue
 
   @enforce_keys [:min, :max]
   defstruct [:min, :max]
@@ -15,18 +14,12 @@ defmodule MacroCompiler.Parser.RandCommand do
     sequence([
       ignore(string("&rand(")),
 
-      choice([
-        ScalarVariable.parser(),
-        TextValue.parser()
-      ]),
+      ScalarValue.parser(),
 
       ignore(char(",")),
       skip(spaces()),
 
-      choice([
-        ScalarVariable.parser(),
-        TextValue.parser()
-      ]),
+      ScalarValue.parser(),
 
       ignore(char(")"))
     ])

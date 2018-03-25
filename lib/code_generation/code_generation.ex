@@ -262,12 +262,6 @@ defmodule MacroCompiler.CodeGeneration do
     ]
   end
 
-  defp generate(integer, ast, symbolsTable) when is_integer(integer) do
-    [
-      integer
-    ]
-  end
-
   defp generate(_undefinedNode, _ast, _symbolsTable) do
 
   end
