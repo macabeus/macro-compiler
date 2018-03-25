@@ -4,14 +4,16 @@ defmodule MacroCompiler.Parser.ScalarValue do
 
   import MacroCompiler.Parser.Lazy
 
-  alias MacroCompiler.Parser.RandCommand
-  alias MacroCompiler.Parser.TextValue
   alias MacroCompiler.Parser.ScalarVariable
+  alias MacroCompiler.Parser.RandCommand
+  alias MacroCompiler.Parser.RandomCommand
+  alias MacroCompiler.Parser.TextValue
 
   def parser() do
     choice([
       lazy(ScalarVariable.parser()),
       lazy(RandCommand.parser()),
+      lazy(RandomCommand.parser()),
       lazy(TextValue.parser())
     ])
   end
