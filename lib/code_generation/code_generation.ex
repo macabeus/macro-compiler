@@ -100,13 +100,17 @@ defmodule MacroCompiler.CodeGeneration do
     ]
   end
 
-  defp generate(%ScalarVariable{name: name, array_position: array_position, hash_position: hash_position}, _ast, _symbolsTable) do
+  defp generate(%ScalarVariable{name: name, array_position: array_position, hash_position: hash_position}, ast, symbolsTable) do
     case {name, array_position, hash_position} do
       {name, nil, nil} ->
         "$#{name}"
 
       {name, array_position, nil} ->
-        "$#{name}[#{array_position}]"
+        [
+          "$#{name}[",
+          generate(array_position, ast, symbolsTable),
+          "]"
+        ]
 
       {name, nil, hash_position} ->
         "$#{name}{#{hash_position}}"
@@ -255,6 +259,12 @@ defmodule MacroCompiler.CodeGeneration do
       " - ",
       generate(min, ast, symbolsTable),
       ")))"
+    ]
+  end
+
+  defp generate(integer, ast, symbolsTable) when is_integer(integer) do
+    [
+      integer
     ]
   end
 

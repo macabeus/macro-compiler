@@ -24,6 +24,12 @@ defmodule MacroCompiler.Optimization.DeadCodeStrip.Variables do
       %{macro_write: %{block: block}} ->
         Enum.map(block, &find_variables_read/1)
 
+      %{variable_read: x, variable_name: {name, _metadata}} when is_list(x) ->
+        [
+          name,
+          Enum.map(x, &find_variables_read/1)
+        ]
+
       %{variable_read: x} when is_list(x) ->
         Enum.map(x, &find_variables_read/1)
 

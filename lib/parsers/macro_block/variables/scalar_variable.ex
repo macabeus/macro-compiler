@@ -3,9 +3,13 @@ defmodule MacroCompiler.Parser.ScalarVariable do
   use Combine.Helpers
 
   import MacroCompiler.Parser
+  import MacroCompiler.Parser.Lazy
 
   alias MacroCompiler.Parser.ScalarVariable
   alias MacroCompiler.Parser.Identifier
+  alias MacroCompiler.Parser.RandCommand
+
+  alias Combine.ParserState
 
   @enforce_keys [:name, :array_position, :hash_position]
   defstruct [:name, :array_position, :hash_position]
@@ -18,7 +22,11 @@ defmodule MacroCompiler.Parser.ScalarVariable do
       option(
         between(
           char("["),
-          Identifier.parser(),
+          choice([
+            lazy(ScalarVariable.parser()),
+            lazy(RandCommand.parser()),
+            integer()
+          ]),
           char("]")
         )
       ),

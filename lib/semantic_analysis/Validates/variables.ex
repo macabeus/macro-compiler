@@ -66,6 +66,12 @@ defmodule MacroCompiler.SemanticAnalysis.Validates.Variables do
       %{macro_write: %{block: block}} ->
         Enum.map(block, &find_variables_read/1)
 
+      %{variable_read: x, variable_name: {name, metadata}} when is_list(x) ->
+        [
+          %{name: name, metadata: metadata},
+          Enum.map(x, &find_variables_read/1)
+        ]
+
       %{variable_read: x} when is_list(x) ->
         Enum.map(x, &find_variables_read/1)
 
