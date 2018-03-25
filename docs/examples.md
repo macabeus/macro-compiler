@@ -48,7 +48,7 @@ macro arrayVariables {
   # Array variable manipulation
   $firstElement = $array[0]
   log The first element is $firstElement
-  
+
   log And the second element is $array[1]
 
   &push(@array, openkore)
@@ -69,15 +69,15 @@ sub on_unload { }
 
 sub macro_arrayVariables {
   @array = ("prontera","42","don't panic");
-  
+
   $firstElement = $array["0"];
   message "The first element is $firstElement"."\n";
-  
+
   message "And the second element is ".$array["1"].""."\n";
-  
+
   push @array,"openkore";
   message "\@array now has ".scalar(@array)." elements"."\n";
-  
+
   shift @array;
   message "\@array now has ".scalar(@array)." elements"."\n";
 }
@@ -136,25 +136,28 @@ sub macro_hashVariables {
 }
 ```
 
-## Random
+## Rand and Random
 
 ```
-macro goToRandomCity {
+macro randoms {
+  # Random number
   $min = 2
   $randomNumber = &rand($min, 10)
   log The random number is $randomNumber
 
+  # Random element from array
   @cities = (prontera, payon, geffen, morroc)
   $randomCity = $cities[&rand(0, 3)]
-
   log I'll go to $randomCity !
-  do move $randomCity
+
+  # Or...
+  $randomCity = &random(prontera, payon, geffen, marroc)
+  log I'll go to $randomCity !
 }
 ```
 
 ```
 package macroCompiled;
-use Commands;
 use Log qw(message);
 my $min;
 my $randomCity;
@@ -163,16 +166,17 @@ my @cities;
 Plugins::register('macroCompiled', 'Compiled version of eventMacro.txt', &on_unload);
 sub on_unload { }
 
-sub macro_goToRandomCity {
+sub macro_randoms {
   $min = "2";
   $randomNumber = ($min + int(rand(1 + "10" - $min)));
   message "The random number is $randomNumber"."\n";
-  
+
   @cities = ("prontera","payon","geffen","morroc");
   $randomCity = $cities[("0" + int(rand(1 + "3" - "0")))];
-
   message "I'll go to $randomCity !"."\n";
-  Commands::run("move $randomCity");
+
+  $randomCity = (("prontera","payon","geffen","marroc")[int (rand 4)]);
+  message "I'll go to $randomCity !"."\n";
 }
 ```
 
