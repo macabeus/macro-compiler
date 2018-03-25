@@ -52,7 +52,7 @@ sub macro_goToRandomCity {
 
 ```
 
-Then you could use this plugin.
+Then you could use this plugin. [You can see more examples where.](docs/examples.md)
 
 # How to run
 
