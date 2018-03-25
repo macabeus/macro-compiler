@@ -207,3 +207,36 @@ sub macro_b {
   message "Macro b called!"."\n";
 }
 ```
+
+# Optimization
+
+MacroCompiler has Optimization phase, in order to create an equivalent code, but that results in a faster and smaller code.
+
+## Dead code strip
+
+It'll removes useless variables.
+
+This both codes are equivalents:
+
+```
+macro blah {
+  $foo++
+  $foo++
+  $bar = 3
+  @array = (1, $foo, $bar)
+
+  $a = 1
+  $b = 2
+  %c = (a => $a, b => $b)
+
+  log only $bar is read
+}
+```
+
+```
+macro blah {
+  $bar = 3
+
+  log only $bar is read
+}
+```
