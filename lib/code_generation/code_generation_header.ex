@@ -19,10 +19,10 @@ defmodule MacroCompiler.CodeGenerationHeader do
   alias MacroCompiler.Parser.KeysCommand
   alias MacroCompiler.Parser.ValuesCommand
 
-  def generate(node, ast, symbolsTable) do
+  def generate(node, symbolsTable) do
     IO.puts "package macroCompiled;"
 
-    find_requirements(node, ast, symbolsTable)
+    find_requirements(node, symbolsTable)
     |> List.flatten
     |> MapSet.new
     |> MapSet.delete(nil)
@@ -39,89 +39,89 @@ defmodule MacroCompiler.CodeGenerationHeader do
     """
   end
 
-  defp find_requirements({_node, %{ignore: true}}, ast, symbolsTable) do
+  defp find_requirements({_node, %{ignore: true}}, symbolsTable) do
 
   end
 
-  defp find_requirements({node, _metadata}, ast, symbolsTable) do
-    find_requirements(node, ast, symbolsTable)
+  defp find_requirements({node, _metadata}, symbolsTable) do
+    find_requirements(node, symbolsTable)
   end
 
-  defp find_requirements(block, ast, symbolsTable) when is_list(block) do
-    Enum.map(block, &(find_requirements(&1, ast, symbolsTable)))
+  defp find_requirements(block, symbolsTable) when is_list(block) do
+    Enum.map(block, &(find_requirements(&1, symbolsTable)))
   end
 
-  defp find_requirements(%Macro{name: _name, block: block}, ast, symbolsTable) do
-    find_requirements(block, ast, symbolsTable)
+  defp find_requirements(%Macro{name: _name, block: block}, symbolsTable) do
+    find_requirements(block, symbolsTable)
   end
 
-  defp find_requirements(%DoCommand{text: _text}, _ast, _symbolsTable) do
+  defp find_requirements(%DoCommand{text: _text}, _symbolsTable) do
     %{module: "Commands"}
   end
 
-  defp find_requirements(%LogCommand{text: _text}, _ast, _symbolsTable) do
+  defp find_requirements(%LogCommand{text: _text}, _symbolsTable) do
     %{module: "Log qw(message)"}
   end
 
-  defp find_requirements(%ScalarAssignmentCommand{scalar_variable: scalar_variable, scalar_value: _scalar_value}, ast, symbolsTable) do
-    find_requirements(scalar_variable, ast, symbolsTable)
+  defp find_requirements(%ScalarAssignmentCommand{scalar_variable: scalar_variable, scalar_value: _scalar_value}, symbolsTable) do
+    find_requirements(scalar_variable, symbolsTable)
   end
 
-  defp find_requirements(%ArrayAssignmentCommand{array_variable: array_variable, texts: _texts}, ast, symbolsTable) do
-    find_requirements(array_variable, ast, symbolsTable)
+  defp find_requirements(%ArrayAssignmentCommand{array_variable: array_variable, texts: _texts}, symbolsTable) do
+    find_requirements(array_variable, symbolsTable)
   end
 
-  defp find_requirements(%HashAssignmentCommand{hash_variable: hash_variable, keystexts: _keystexts}, ast, symbolsTable) do
-    find_requirements(hash_variable, ast, symbolsTable)
+  defp find_requirements(%HashAssignmentCommand{hash_variable: hash_variable, keystexts: _keystexts}, symbolsTable) do
+    find_requirements(hash_variable, symbolsTable)
   end
 
-  defp find_requirements(%DeleteCommand{scalar_variable: scalar_variable}, ast, symbolsTable) do
-    find_requirements(scalar_variable, ast, symbolsTable)
+  defp find_requirements(%DeleteCommand{scalar_variable: scalar_variable}, symbolsTable) do
+    find_requirements(scalar_variable, symbolsTable)
   end
 
-  defp find_requirements(%KeysCommand{array_variable: array_variable, param_hash_variable: param_hash_variable}, ast, symbolsTable) do
+  defp find_requirements(%KeysCommand{array_variable: array_variable, param_hash_variable: param_hash_variable}, symbolsTable) do
     [
-      find_requirements(array_variable, ast, symbolsTable),
-      find_requirements(param_hash_variable, ast, symbolsTable)
+      find_requirements(array_variable, symbolsTable),
+      find_requirements(param_hash_variable, symbolsTable)
     ]
   end
 
-  defp find_requirements(%ValuesCommand{array_variable: array_variable, param_hash_variable: param_hash_variable}, ast, symbolsTable) do
+  defp find_requirements(%ValuesCommand{array_variable: array_variable, param_hash_variable: param_hash_variable}, symbolsTable) do
     [
-      find_requirements(array_variable, ast, symbolsTable),
-      find_requirements(param_hash_variable, ast, symbolsTable)
+      find_requirements(array_variable, symbolsTable),
+      find_requirements(param_hash_variable, symbolsTable)
     ]
   end
 
-  defp find_requirements(%UndefCommand{scalar_variable: scalar_variable}, ast, symbolsTable) do
-    find_requirements(scalar_variable, ast, symbolsTable)
+  defp find_requirements(%UndefCommand{scalar_variable: scalar_variable}, symbolsTable) do
+    find_requirements(scalar_variable, symbolsTable)
   end
 
-  defp find_requirements(%IncrementCommand{scalar_variable: scalar_variable}, ast, symbolsTable) do
-    find_requirements(scalar_variable, ast, symbolsTable)
+  defp find_requirements(%IncrementCommand{scalar_variable: scalar_variable}, symbolsTable) do
+    find_requirements(scalar_variable, symbolsTable)
   end
 
-  defp find_requirements(%DecrementCommand{scalar_variable: scalar_variable}, ast, symbolsTable) do
-    find_requirements(scalar_variable, ast, symbolsTable)
+  defp find_requirements(%DecrementCommand{scalar_variable: scalar_variable}, symbolsTable) do
+    find_requirements(scalar_variable, symbolsTable)
   end
 
-  defp find_requirements(%PushCommand{array_variable: array_variable, text: _text}, ast, symbolsTable) do
-    find_requirements(array_variable, ast, symbolsTable)
+  defp find_requirements(%PushCommand{array_variable: array_variable, text: _text}, symbolsTable) do
+    find_requirements(array_variable, symbolsTable)
   end
 
-  defp find_requirements(%PopCommand{array_variable: array_variable}, ast, symbolsTable) do
-    find_requirements(array_variable, ast, symbolsTable)
+  defp find_requirements(%PopCommand{array_variable: array_variable}, symbolsTable) do
+    find_requirements(array_variable, symbolsTable)
   end
 
-  defp find_requirements(%ShiftCommand{array_variable: array_variable}, ast, symbolsTable) do
-    find_requirements(array_variable, ast, symbolsTable)
+  defp find_requirements(%ShiftCommand{array_variable: array_variable}, symbolsTable) do
+    find_requirements(array_variable, symbolsTable)
   end
 
-  defp find_requirements(%UnshiftCommand{array_variable: array_variable, text: _text}, ast, symbolsTable) do
-    find_requirements(array_variable, ast, symbolsTable)
+  defp find_requirements(%UnshiftCommand{array_variable: array_variable, text: _text}, symbolsTable) do
+    find_requirements(array_variable, symbolsTable)
   end
 
-  defp find_requirements(%ScalarVariable{name: name, array_position: nil, hash_position: hash_position}, _ast, _symbolsTable) do
+  defp find_requirements(%ScalarVariable{name: name, array_position: nil, hash_position: hash_position}, _symbolsTable) do
     case {name, hash_position} do
       {name, nil} ->
         %{variable: "$#{name}"}
@@ -131,15 +131,15 @@ defmodule MacroCompiler.CodeGenerationHeader do
     end
   end
 
-  defp find_requirements(%ArrayVariable{name: name}, _ast, _symbolsTable) do
+  defp find_requirements(%ArrayVariable{name: name}, _symbolsTable) do
     %{variable: "@#{name}"}
   end
 
-  defp find_requirements(%HashVariable{name: name}, _ast, _symbolsTable) do
+  defp find_requirements(%HashVariable{name: name}, _symbolsTable) do
     %{variable: "%#{name}"}
   end
 
-  defp find_requirements(_undefinedNode, _ast, _symbolsTable) do
+  defp find_requirements(_undefinedNode, _symbolsTable) do
 
   end
 end

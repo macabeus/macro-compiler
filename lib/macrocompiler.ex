@@ -25,8 +25,8 @@ defmodule MacroCompiler do
 
       optimized_ast = Optimization.build_ast_otimatized(ast)
 
-      CodeGenerationHeader.generate(optimized_ast, optimized_ast, symbols_table)
-      CodeGeneration.start_generate(optimized_ast, optimized_ast, symbols_table)
+      CodeGenerationHeader.generate(optimized_ast, symbols_table)
+      CodeGeneration.start_generate(optimized_ast, symbols_table)
 
     rescue
       e in SyntaxError ->
