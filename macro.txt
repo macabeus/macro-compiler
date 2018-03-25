@@ -1,9 +1,7 @@
-macro Hello {
-  do ola
-  log foo bar baz
-  call help "my parameter" "another"
-}
+macro goToRandomCity {
+  @cities = (prontera, payon, geffen, morroc)
+  $randomCity = $cities[&rand(0, 3)]
 
-macro help {
-  do ajuda
+  log I'll go to $randomCity !
+  do move $randomCity
 }
