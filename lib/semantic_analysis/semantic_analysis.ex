@@ -23,6 +23,8 @@ defmodule MacroCompiler.SemanticAnalysis do
   alias MacroCompiler.Parser.RandCommand
   alias MacroCompiler.Parser.RandomCommand
 
+  alias MacroCompiler.SemanticAnalysis.LatestVariableWrites
+
   import MacroCompiler.SemanticAnalysis.Validates.Variables
   import MacroCompiler.SemanticAnalysis.Validates.Macros
 
@@ -50,7 +52,11 @@ defmodule MacroCompiler.SemanticAnalysis do
 
   defp symbols_table({%Macro{name: name, block: block}, _metadata}) do
     %{
-      macro_write: %{name: name, block: symbols_table(block)}
+      macro_write: %{
+        name: name,
+        block: symbols_table(block),
+        last_write_variables: LatestVariableWrites.build(block)
+      }
     }
   end
 
