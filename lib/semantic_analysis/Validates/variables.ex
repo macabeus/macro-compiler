@@ -37,7 +37,7 @@ defmodule MacroCompiler.SemanticAnalysis.Validates.Variables do
       |> Enum.map(fn({variable_name, metadatas}) -> %{
         type: :warning,
         metadatas: metadatas,
-        message: [:black, :normal,  "variable ", :red, variable_name, :black, " is called but it has never been written."]
+        message: ["variable ", :red, variable_name, :default_color, " is read but it has never been written."]
       } end)
 
     messages_variables_write =
@@ -55,7 +55,7 @@ defmodule MacroCompiler.SemanticAnalysis.Validates.Variables do
       |> Enum.map(fn({variable_name, metadatas}) -> %{
         type: :warning,
         metadatas: metadatas,
-        message: [:black, :normal,  "variable ", :red, variable_name, :black, " is write but it has never read."]
+        message: ["variable ", :red, variable_name, :default_color, " is write but it has never read."]
       } end)
 
     [messages_variables_read, messages_variables_write]

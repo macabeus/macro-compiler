@@ -25,7 +25,7 @@ defmodule MacroCompiler.SemanticAnalysis.Validates.Macros do
     |> Enum.map(fn({macro_name, metadatas}) -> %{
       type: :warning,
       metadatas: metadatas,
-      message: [:black, :normal,  "macro ", :red, macro_name, :black, " is called but it has never been written."]
+      message: ["macro ", :red, macro_name, :default_color, " is called but it has never been written."]
     } end)
   end
 
