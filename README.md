@@ -7,17 +7,17 @@
 
 >The best way to create macros.
 
-MacroCompiler compiles from the language [EventMacro](http://openkore.com/index.php/EventMacro) to [OpenKore](https://github.com/OpenKore/openkore/) plugin (that is, Perl). EventMacro is a language to automate the actions from OpenKore – the bot used in the Rangarok online game. It compiles to Perl since OpenKore itself is written in Perl.
+MacroCompiler compiles [EventMacro](http://openkore.com/index.php/EventMacro) to the [OpenKore](https://github.com/OpenKore/openkore/) plugin (that is, Perl). EventMacro is a language to automate the actions from OpenKore – the bot used in the Rangarok online game. It compiles to Perl since OpenKore itself is written in Perl.
 
-Using the EventMacro you can configure the bot to complete quests or to buy itens, for example. Currently the only solution to run EventMacro on OpenKore is using a regex-based interpreter, but it's a bad solution. This project aims to offer a faster, more secure and more flexible alternative to run macros on OpenKore.
+You may use EventMacro to configure the bot to complete quests or to buy itens, for example. Currently the only solution to run EventMacro on OpenKore is using a regex-based interpreter, which is a bad solution. This project aims to offer a faster, more reliable and flexible alternative to run macros on OpenKore.
 
-**Faster** because the OpenKore doesn't need to interpret a Macro code to then run Perl code. Now it runs Perl code directly. And the compiler can optimize the EventMacro.
-**More secure** because the compiler shows errors, then you can fix them before running the bot.
-**More flexible** because it's easier to add new features in a compiler than a regex-based interpreter.
+**Faster** because the OpenKore doesn't need to interpret a Macro code to run Perl code. Now it runs Perl code directly and the compiler can optimize the EventMacro.
+**More reliable** because the compiler shows errors and you are able to fix them before actually running the bot.
+**More flexible** because it is easier to add new features in a compiler than in a regex-based interpreter.
 
->Hey! Warning: This project is under construction, then it's incomplete and it only has a tiny subset of EventMacro commands.
+>Hey! Warning: This project is under construction, thus it is incomplete and currently only has a tiny subset of EventMacro commands.
 
->You can follow the MacroCompiler development [on this post](http://openkorebrasil.org/index.php?/topic/4457-projeto-macro-compiler-compilador-do-eventmacro/) (in Portuguese)
+>You may follow the MacroCompiler development [on this post](http://openkorebrasil.org/index.php?/topic/4457-projeto-macro-compiler-compilador-do-eventmacro/) (in Portuguese)
 
 # Example
 
@@ -52,13 +52,13 @@ sub macro_goToRandomCity {
 
 ```
 
-Then you could use this plugin. [You can see more examples where.](docs/examples.md)
+Then you could use this plugin. [You may see more examples here.](docs/examples.md)
 
 # How to run
 
-You must have Elixir in your computer. [You could read here how to install it](https://elixir-lang.org/install.html).
+You must have Elixir in your computer. [Read how to install Elixir here](https://elixir-lang.org/install.html).
 
-To compile your macro, you need to run this command:
+Run the command below so you can compile your macro:
 
 ```
 mix run lib/macrocompiler.ex path/of/eventMacro.txt > macro.pl
@@ -66,25 +66,25 @@ mix run lib/macrocompiler.ex path/of/eventMacro.txt > macro.pl
 
 # How does it work?
 
-Since this is a project for studying purposes, I'll explain how I created it, including its logic and design.
+Since this is a project for studying purposes, I will explain how I created it, including its logic and design.
 
 ## Language design
 
-I **haven't** designed EventMacro: its spec's been already made by other people, and my compiler just needs to keep interoperability. A few important things that have influenced EventMacro design are:
+I **have not** designed EventMacro: its specs have been already made by other people and my compiler only needs to keep interoperability. A few important things that have influenced EventMacro design are:
 
-- Perl inspiration; given the fact that OpenKore is written in Perl and many people that work on OpenKore project also write macros;
+- Perl inspiration; given the fact that OpenKore is written in Perl and many people who work on OpenKore project also write macros;
 - The syntax was designed in order to make it easy to write a regexp-based interpreter;
 - It was designed aiming to ease non-programmers' learning process.
 
-> Designing a programming language and a compiler are processes that have very different focuses, but many tasks in common. [You can read more about it here.](https://www.quora.com/Which-is-the-difference-between-design-a-programming-language-and-design-a-compiler/answer/Quildreen-Motta)
+> Designing a programming language and a compiler are processes that have very different focuses, but many tasks in common. [You may read more about it here.](https://www.quora.com/Which-is-the-difference-between-design-a-programming-language-and-design-a-compiler/answer/Quildreen-Motta)
 
 ## Parser
 
 I decided to write the parser using a parser combinator-based strategy because Elixir already has an awesome library for doing so: [Combine](https://github.com/bitwalker/combine). In this phase, the parser maps the source code on a representation called AST - Abstract Syntax Tree. We only have this intermediary representation through the whole compiler.
 
-An advantage of parser combinator is that we get the AST directly, but a disadvantage is that we'll have poor error messages.
+An advantage of parser combinator is that we get the AST directly, but a disadvantage is that we will have poor error messages.
 
-On my compiler, each node on the AST is a tuple with two elements, where the first element is the struct representing the mapped code and the second one is its metadata. The metadata is important to return a meaningful error message on the next phases (e.g. to tell the coder the line and column where the error happened). Another situation where the metadata is important is on the optimization phase - I'll provide more details about it bellow.
+On my compiler, each node on the AST is a tuple with two elements, where the first element is the struct representing the mapped code and the second one is its metadata. The metadata is important to return a meaningful error message on the next phases (e.g. to tell the coder the line and column where the error happened). Another situation where the metadata is important is on the optimization phase - I will provide more details about it bellow.
 
 ## Semantic analysis
 
@@ -94,7 +94,7 @@ The aim of semantic analysis is to check whether the code is semantically valid 
 
 ## Optimization
 
-The optimizer uses both the AST and the symbol table in order to create an equivalent AST, but that results in a faster and smaller code. For example, an optimization implemented in MacroCompiler is [dead code elimination](https://en.wikipedia.org/wiki/Dead_code_elimination). A variable that is written but never called is useless so the optimizer finds these situations and tells the node's metadata to ignore this node on code generation phase.
+The optimizer uses both the AST and the symbol table in order to create an equivalent AST, but that results in a faster and smaller code. For example, an optimization implemented in MacroCompiler is [dead code elimination](https://en.wikipedia.org/wiki/Dead_code_elimination). A variable that is written but never called is useless so the optimizer finds these situations and tells the node's metadata to ignore or completely remove this node on code generation phase.
 
 ## Code generation
 
