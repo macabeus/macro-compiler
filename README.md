@@ -7,7 +7,7 @@
 
 >The best way to create macros.
 
-MacroCompiler compiles [EventMacro](http://openkore.com/index.php/EventMacro) to the [OpenKore](https://github.com/OpenKore/openkore/) plugin (that is, Perl). EventMacro is a language to automate the actions from OpenKore – the bot used in the Rangarok online game. It compiles to Perl since OpenKore itself is written in Perl.
+MacroCompiler compiles [EventMacro](http://openkore.com/index.php/EventMacro) to a [OpenKore](https://github.com/OpenKore/openkore/) plugin (that is, Perl). EventMacro is a language to automate the actions from OpenKore – the bot used in the Rangarok online game. It compiles to Perl since OpenKore itself is written in Perl.
 
 You may use EventMacro to configure the bot to complete quests or to buy itens, for example. Currently the only solution to run EventMacro on OpenKore is using a regex-based interpreter, which is a bad solution. This project aims to offer a faster, more reliable and flexible alternative to run macros on OpenKore.
 
