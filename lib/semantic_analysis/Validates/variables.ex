@@ -35,7 +35,7 @@ defmodule MacroCompiler.SemanticAnalysis.Validates.Variables do
         end
       end)
       |> Enum.map(fn({variable_name, metadatas}) -> %{
-        type: :warning,
+        type: :error,
         metadatas: metadatas,
         message: ["variable ", :red, variable_name, :default_color, " is read but it has never been written."]
       } end)

@@ -2,6 +2,7 @@ defmodule MacroCompiler.Error.ShowErrors do
   import MacroCompiler.Error.Utils
 
   alias MacroCompiler.Parser.SyntaxError
+  alias MacroCompiler.SemanticAnalysis.FatalError, as: FatalSemanticError
 
   defp puts_stderr(message), do: IO.puts(:stderr, message)
 
@@ -36,14 +37,44 @@ defmodule MacroCompiler.Error.ShowErrors do
   ###
   # Semantic analysis error message
   def show(file, validates_result) do
-    warning_message_prefix = IO.ANSI.format([:yellow, :bright, "Warning: "])
-
     validates_result
-    |> Enum.each(&case &1 do
-      %{type: :warning, message: message, metadatas: metadatas} ->
-        [warning_message_prefix | message] ++ " #{metadates_to_line_column_message(file, metadatas)}"
-        |> IO.ANSI.format
-        |> puts_stderr
+    |> sort_validates_result
+    |> Enum.map(fn %{type: type, message: message, metadatas: metadatas} ->
+      format_message(file, type, message, metadatas)
+      |> IO.ANSI.format
+    end)
+    |> Enum.each(&puts_stderr/1)
+  end
+
+  defp sort_validates_result(validates_result) do
+    priorities = %{error: 0, warning: 1}
+
+    Enum.sort(validates_result, fn (%{type: type_a}, %{type: type_b}) ->
+      Map.get(priorities, type_a) < Map.get(priorities, type_b)
+    end)
+  end
+
+  defp format_message(file, type, message, metadatas) do
+    prefix = case type do
+      :warning ->
+        IO.ANSI.format([:yellow, :bright, "Warning: "])
+
+      :error ->
+        IO.ANSI.format([:yellow, :bright, "FATAL ERROR: "])
+    end
+
+    [prefix | message] ++ " #{metadates_to_line_column_message(file, metadatas)}"
+  end
+
+  def raise_fatal_error(validates_result) do
+    if has_fatal_error?(validates_result) do
+      raise FatalSemanticError, message: "Could not be compiled because some fatal error happened"
+    end
+  end
+
+  defp has_fatal_error?(validates_result) do
+    Enum.any?(validates_result, fn %{type: type} ->
+      type == :error
     end)
   end
 

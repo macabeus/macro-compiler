@@ -5,6 +5,7 @@ defmodule MacroCompiler do
   alias MacroCompiler.Parser.SyntaxError
 
   alias MacroCompiler.SemanticAnalysis
+  alias MacroCompiler.SemanticAnalysis.FatalError, as: FatalSemanticError
 
   alias MacroCompiler.Error.ShowErrors
 
@@ -22,6 +23,7 @@ defmodule MacroCompiler do
       symbols_table = SemanticAnalysis.build_symbols_table(ast)
       validates_result = SemanticAnalysis.run_validates(symbols_table)
       ShowErrors.show(file, validates_result)
+      ShowErrors.raise_fatal_error(validates_result)
 
       optimized_ast = Optimization.build_ast_otimatized(ast)
 
@@ -31,6 +33,9 @@ defmodule MacroCompiler do
     rescue
       e in SyntaxError ->
         ShowErrors.show(file, e)
+
+      e in FatalSemanticError ->
+        IO.puts e.message
     end
   end
 end
