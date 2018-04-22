@@ -1,4 +1,4 @@
-defmodule MacroCompiler.Error.ShowErrors do
+defmodule MacroCompiler.Error do
   import MacroCompiler.Error.Utils
 
   alias MacroCompiler.Parser.SyntaxError
