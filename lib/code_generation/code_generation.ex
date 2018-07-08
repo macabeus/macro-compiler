@@ -27,7 +27,6 @@ defmodule MacroCompiler.CodeGeneration do
   def start_generate(block, symbolsTable) do
     Enum.map(block, &(generate(&1, symbolsTable)))
     |> List.flatten
-    |> Enum.map(&IO.puts/1)
   end
 
   defp generate({_node, %{ignore: true}}, symbolsTable) do

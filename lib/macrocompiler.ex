@@ -14,7 +14,7 @@ defmodule MacroCompiler do
   alias MacroCompiler.CodeGeneration
   alias MacroCompiler.CodeGenerationHeader
 
-  def start_parser(macro_file) do
+  def compiler(macro_file) do
     file = File.read!(macro_file)
 
     try do
@@ -27,8 +27,9 @@ defmodule MacroCompiler do
 
       optimized_ast = Optimization.build_ast_otimatized(ast)
 
-      CodeGenerationHeader.generate(optimized_ast, symbols_table)
-      CodeGeneration.start_generate(optimized_ast, symbols_table)
+      []
+      |> Enum.concat(CodeGenerationHeader.generate(optimized_ast, symbols_table))
+      |> Enum.concat(CodeGeneration.start_generate(optimized_ast, symbols_table))
 
     rescue
       e in SyntaxError ->
@@ -38,10 +39,15 @@ defmodule MacroCompiler do
         IO.puts e.message
     end
   end
+
+  def print_result(generated_code) do
+    generated_code
+    |> Enum.each(&IO.puts/1)
+  end
 end
 
 
 case System.argv do
-  [] -> MacroCompiler.start_parser("macro.txt")
-  [macro_file] -> MacroCompiler.start_parser(macro_file)
+  [] -> MacroCompiler.compiler("macro.txt") |> MacroCompiler.print_result
+  [macro_file] -> MacroCompiler.compiler(macro_file) |> MacroCompiler.print_result
 end
