@@ -21,3 +21,6 @@ erl_crash.dump
 
 # Macro compiled file
 perl.pl
+
+# e2e temp files
+test/e2e/perl/codes/
