@@ -11,9 +11,9 @@ defmodule MacroCompiler do
 
   alias MacroCompiler.Optimization
 
-  alias MacroCompiler.CodeGeneration
-  alias MacroCompiler.CodeGenerationHeader
-  alias MacroCompiler.CodeGenerationFooter
+  alias MacroCompiler.CodeGeneration.Header, as: CodeGenerationHeader
+  alias MacroCompiler.CodeGeneration.Body, as: CodeGenerationBody
+  alias MacroCompiler.CodeGeneration.Footer, as: CodeGenerationFooter
 
   def compiler(macro_file) do
     file = File.read!(macro_file)
@@ -30,7 +30,7 @@ defmodule MacroCompiler do
 
       []
       |> Enum.concat(CodeGenerationHeader.generate(optimized_ast, symbols_table))
-      |> Enum.concat(CodeGeneration.start_generate(optimized_ast, symbols_table))
+      |> Enum.concat(CodeGenerationBody.start_generate(optimized_ast, symbols_table))
       |> Enum.concat(CodeGenerationFooter.generate())
 
     rescue

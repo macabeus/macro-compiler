@@ -1,4 +1,4 @@
-defmodule MacroCompiler.CodeGenerationHeader do
+defmodule MacroCompiler.CodeGeneration.Header do
   alias MacroCompiler.Parser.Macro
   alias MacroCompiler.Parser.DoCommand
   alias MacroCompiler.Parser.LogCommand
