@@ -64,6 +64,12 @@ Run the command below so you can compile your macro:
 mix run lib/macrocompiler.ex path/of/eventMacro.txt > macro.pl
 ````
 
+# Test
+
+```
+mix test
+```
+
 # How does it work?
 
 Since this is a project for studying purposes, I will explain how I created it, including its logic and design.
