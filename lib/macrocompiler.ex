@@ -13,6 +13,7 @@ defmodule MacroCompiler do
 
   alias MacroCompiler.CodeGeneration
   alias MacroCompiler.CodeGenerationHeader
+  alias MacroCompiler.CodeGenerationFooter
 
   def compiler(macro_file) do
     file = File.read!(macro_file)
@@ -30,6 +31,7 @@ defmodule MacroCompiler do
       []
       |> Enum.concat(CodeGenerationHeader.generate(optimized_ast, symbols_table))
       |> Enum.concat(CodeGeneration.start_generate(optimized_ast, symbols_table))
+      |> Enum.concat(CodeGenerationFooter.generate())
 
     rescue
       e in SyntaxError ->
