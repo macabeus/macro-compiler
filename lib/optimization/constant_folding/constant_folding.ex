@@ -12,14 +12,11 @@ defmodule MacroCompiler.Optimization.ConstantFolding do
 
 
   def optimize(ast, symbols_table) do
-    :ets.new(:macro_last_write_variables, [:set, :private, :named_table])
+    tuple_macro_last_write_variables =
+      symbols_table
+      |> Enum.map(&{&1.macro_write.name, &1.macro_write.last_write_variables})
 
-    symbols_table
-    |> Enum.each(
-      &:ets.insert(:macro_last_write_variables,
-        {&1.macro_write.name, &1.macro_write.last_write_variables}
-      )
-    )
+    Process.put(:macro_last_write_variables, tuple_macro_last_write_variables)
 
     optimized_ast =
       ast
@@ -29,7 +26,7 @@ defmodule MacroCompiler.Optimization.ConstantFolding do
         end
       )
 
-    :ets.delete(:macro_last_write_variables)
+    Process.put(:macro_last_write_variables, nil)
 
     optimized_ast
   end
@@ -123,7 +120,8 @@ defmodule MacroCompiler.Optimization.ConstantFolding do
   end
 
   defp run({%CallCommand{macro: macro}, _} = node, variables_context) do
-    [{_key, last_write_variables}] = :ets.lookup(:macro_last_write_variables, macro)
+    {_macro_name, last_write_variables} =
+      List.keyfind(Process.get(:macro_last_write_variables), macro, 0)
 
     {node, Map.merge(variables_context, last_write_variables)}
   end
