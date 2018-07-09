@@ -1,4 +1,4 @@
-defmodule MacroCompiler.CodeGeneration do
+defmodule MacroCompiler.CodeGeneration.Body do
   alias MacroCompiler.Parser.Macro
   alias MacroCompiler.Parser.CallCommand
   alias MacroCompiler.Parser.DoCommand
@@ -27,7 +27,6 @@ defmodule MacroCompiler.CodeGeneration do
   def start_generate(block, symbolsTable) do
     Enum.map(block, &(generate(&1, symbolsTable)))
     |> List.flatten
-    |> Enum.map(&IO.puts/1)
   end
 
   defp generate({_node, %{ignore: true}}, symbolsTable) do
