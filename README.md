@@ -1,7 +1,7 @@
 <h1 align="center"> MacroCompiler </h1> <br>
 <p align="center">
   <a href="">
-    <img alt="Logo" src="https://i.imgur.com/QeSM2Ca.png" width="108">
+    <img alt="Logo" src="https://raw.githubusercontent.com/macabeus/macro-compiler/master/docs/logo-small.png">
   </a>
 </p>
 
