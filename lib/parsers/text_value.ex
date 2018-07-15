@@ -12,27 +12,33 @@ defmodule MacroCompiler.Parser.TextValue do
 
   defp get_char(limited) do
     if limited do
-      satisfy(char(),
-      fn "\n" -> false;
-        "#" -> false;
-        "," -> false;
-        "(" -> false;
-        ")" -> false;
-        "]" -> false;
-        "{" -> false;
-        "}" -> false;
-        "+" -> false;
-        "-" -> false;
+      satisfy(
+        char(),
+        fn
+          "\n" -> false;
+          "#"  -> false;
+          ","  -> false;
+          "("  -> false;
+          ")"  -> false;
+          "]"  -> false;
+          "{"  -> false;
+          "}"  -> false;
+          "+"  -> false;
+          "-"  -> false;
 
-          _ -> true
-        end)
+          _    -> true
+        end
+      )
     else
-      satisfy(char(),
-        fn "\n" -> false;
-          "#" -> false;
+      satisfy(
+        char(),
+        fn
+          "\n" -> false;
+          "#"  -> false;
 
-            _ -> true
-        end)
+          _  -> true
+        end
+      )
     end
   end
 
