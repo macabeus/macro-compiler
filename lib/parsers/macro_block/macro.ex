@@ -24,7 +24,7 @@ defmodule MacroCompiler.Parser.Macro do
 
       MacroBlock.parser(),
 
-      ignore(char("}"))
+      skip(char("}"))
     ])
   end
 
