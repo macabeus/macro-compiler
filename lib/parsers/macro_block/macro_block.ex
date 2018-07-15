@@ -23,6 +23,7 @@ defmodule MacroCompiler.Parser.MacroBlock do
   alias MacroCompiler.Parser.KeysCommand
   alias MacroCompiler.Parser.ValuesCommand
   alias MacroCompiler.Parser.BlankSpaces
+  alias MacroCompiler.Parser.PostfixIf
 
   def parser() do
     many(
@@ -54,12 +55,15 @@ defmodule MacroCompiler.Parser.MacroBlock do
            # then it's a syntax error
            if_not(char(?}), SyntaxError.raiseAtPosition()),
          ]),
+         option(PostfixIf.parser()),
          skip(BlankSpaces.parser())
      ]),
 
      fn
-       [node] -> node
+       [node, nil] -> node
+       [node_command, {node_postfix, postfix_metadata}] -> {%{node_postfix | body: node_command}, postfix_metadata}
        [] -> nil
+       [nil] -> nil
      end)
     )
   end

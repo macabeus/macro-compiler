@@ -6,6 +6,7 @@ defmodule MacroCompiler.Parser.TextValue do
   alias MacroCompiler.Parser.ScalarVariable
   alias MacroCompiler.Parser.ArrayVariable
   alias MacroCompiler.Parser.HashVariable
+  alias MacroCompiler.Parser.PostfixIf
 
   @enforce_keys [:values]
   defstruct [:values]
@@ -42,6 +43,18 @@ defmodule MacroCompiler.Parser.TextValue do
     end
   end
 
+  def if_is_not_postfix_if(block) do
+    if_not(
+      sequence([
+        spaces(),
+        string("if"),
+        spaces(),
+        char(?()
+      ]),
+      block
+    )
+  end
+
   def parser(limited \\ true) do
     map(
       many(
@@ -54,7 +67,9 @@ defmodule MacroCompiler.Parser.TextValue do
           ScalarVariable.parser(),
           ArrayVariable.parser(),
           HashVariable.parser(),
-          get_char(limited)
+          if_is_not_postfix_if(
+            get_char(limited)
+          )
         ])
       ),
       fn values -> %TextValue{values: values} end

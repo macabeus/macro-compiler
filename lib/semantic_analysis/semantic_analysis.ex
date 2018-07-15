@@ -233,6 +233,14 @@ defmodule MacroCompiler.SemanticAnalysis do
     ))
   end
 
+  defp symbols_table({%PostfixIf{condition: condition, body: body}, _metadata}) do
+    [
+      %{variable_read: symbols_table(condition)},
+      %{variable_read: symbols_table(body)},
+      %{variable_write: symbols_table(body)}
+    ]
+  end
+
   defp symbols_table(_undefinedNode) do
 
   end
