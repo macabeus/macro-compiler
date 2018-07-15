@@ -1,5 +1,5 @@
 defmodule MacroCompiler.Test.E2e.Log do
-  use MacroCompiler.Test.E2e.Helper
+  use MacroCompiler.Test.Helper.E2e
 
   def code, do: """
     macro Test {

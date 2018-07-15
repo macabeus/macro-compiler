@@ -26,7 +26,7 @@ defmodule MacroCompiler do
       Error.show(file, validates_result)
       Error.raise_fatal_error(validates_result)
 
-      optimized_ast = Optimization.build_ast_otimatized(ast)
+      optimized_ast = Optimization.build_ast_optimized(ast)
 
       []
       |> Enum.concat(CodeGenerationHeader.generate(optimized_ast, symbols_table))
