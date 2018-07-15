@@ -1,4 +1,4 @@
-defmodule MacroCompiler.Test.E2e.Helper do
+defmodule MacroCompiler.Test.Helper.E2e do
   def compiler_and_run_macro(macro_name, event_macro_code) do
     File.write!("test/e2e/perl/codes/#{macro_name}.txt", event_macro_code)
 
@@ -16,13 +16,13 @@ defmodule MacroCompiler.Test.E2e.Helper do
   defmacro __using__(_opts) do
     quote do
       use ExUnit.Case, async: true
-      import MacroCompiler.Test.E2e.Helper
+      import MacroCompiler.Test.Helper.E2e
 
       @output_index 0
 
       setup_all do
         file_name = __MODULE__ |> to_string() |> String.split(".") |> List.last
-        perl_outputs = MacroCompiler.Test.E2e.Helper.compiler_and_run_macro(file_name, code())
+        perl_outputs = MacroCompiler.Test.Helper.E2e.compiler_and_run_macro(file_name, code())
         {:ok, %{perl_outputs: perl_outputs}}
       end
     end
