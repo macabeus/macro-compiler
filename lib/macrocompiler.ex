@@ -52,5 +52,6 @@ end
 case System.argv do
   [] -> MacroCompiler.compiler("macro.txt") |> MacroCompiler.print_result
   ["test"] -> nil
+  ["test", _] -> nil
   [macro_file] -> MacroCompiler.compiler(macro_file) |> MacroCompiler.print_result
 end
