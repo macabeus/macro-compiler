@@ -22,6 +22,8 @@ defmodule MacroCompiler.SemanticAnalysis do
   alias MacroCompiler.Parser.ValuesCommand
   alias MacroCompiler.Parser.RandCommand
   alias MacroCompiler.Parser.RandomCommand
+  alias MacroCompiler.Parser.PostfixIf
+  alias MacroCompiler.Parser.Condition
 
   alias MacroCompiler.SemanticAnalysis.LatestVariableWrites
   alias MacroCompiler.SemanticAnalysis.ListSpecialVariables
@@ -243,6 +245,15 @@ defmodule MacroCompiler.SemanticAnalysis do
       %{variable_read: symbols_table(body)},
       %{variable_write: symbols_table(body)}
     ]
+  end
+
+  defp symbols_table({%Condition{scalar_variable: scalar_variable, value: value}, _metadata}) do
+    [scalar_variable, value]
+    |> Enum.map(&(
+      %{
+        variable_read: symbols_table(&1)
+      }
+    ))
   end
 
   defp symbols_table(_undefinedNode) do

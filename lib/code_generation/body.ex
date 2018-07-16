@@ -24,6 +24,8 @@ defmodule MacroCompiler.CodeGeneration.Body do
   alias MacroCompiler.Parser.RandCommand
   alias MacroCompiler.Parser.RandomCommand
   alias MacroCompiler.Parser.PostfixIf
+  alias MacroCompiler.Parser.Condition
+  alias MacroCompiler.Parser.SingleCheck
 
   def start_generate(block, symbolsTable) do
     Enum.map(block, &(generate(&1, symbolsTable)))
@@ -289,9 +291,25 @@ defmodule MacroCompiler.CodeGeneration.Body do
 
   defp generate(%PostfixIf{condition: condition, body: body}, symbolsTable) do
     [
-      "if (#{condition}) {",
+      "if (",
+      generate(condition, symbolsTable),
+      ") {",
       generate(body, symbolsTable),
       "}"
+    ]
+  end
+
+  defp generate(%Condition{scalar_variable: scalar_variable, operator: operator, value: value}, symbolsTable) do
+    [
+      generate(scalar_variable, symbolsTable),
+      operator,
+      generate(value, symbolsTable)
+    ]
+  end
+
+  defp generate(%SingleCheck{scalar_variable: scalar_variable}, symbolsTable) do
+    [
+      generate(scalar_variable, symbolsTable)
     ]
   end
 

@@ -5,6 +5,8 @@ defmodule MacroCompiler.Parser.PostfixIf do
   import MacroCompiler.Parser
 
   alias MacroCompiler.Parser.PostfixIf
+  alias MacroCompiler.Parser.SingleCheck
+  alias MacroCompiler.Parser.Condition
 
   @enforce_keys [:condition]
   defstruct [:condition, :body]
@@ -15,10 +17,10 @@ defmodule MacroCompiler.Parser.PostfixIf do
 
       ignore(string("if (")),
 
-      either(
-        char("0"),
-        char("1")
-      ),
+      choice([
+        Condition.parser(),
+        SingleCheck.parser()
+      ]),
 
       ignore(string(")"))
     ])

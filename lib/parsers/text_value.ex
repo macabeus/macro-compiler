@@ -26,6 +26,7 @@ defmodule MacroCompiler.Parser.TextValue do
           "}"  -> false;
           "+"  -> false;
           "-"  -> false;
+          " "  -> false;
 
           _    -> true
         end

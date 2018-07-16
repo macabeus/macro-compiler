@@ -4,8 +4,8 @@ defmodule MacroCompiler.Test.E2e.PostfixIf do
   def code, do: """
     macro Test {
       log well... if not print it, then something wrong happened if (1)
-      call CallIt if (1)
-      call ShouldNotCallIt if (0)
+      call CallIt if ($.zeny > 0)
+      call ShouldNotCallIt if (1000 != 1000)
     }
 
     macro CallIt {
