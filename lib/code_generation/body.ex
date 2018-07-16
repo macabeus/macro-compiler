@@ -108,6 +108,10 @@ defmodule MacroCompiler.CodeGeneration.Body do
     ]
   end
 
+  defp generate(%ScalarVariable{name: ".zeny"}, _symbolsTable) do
+    "$char->{zeny}"
+  end
+
   defp generate(%ScalarVariable{name: name, array_position: array_position, hash_position: hash_position}, symbolsTable) do
     case {name, array_position, hash_position} do
       {name, nil, nil} ->

@@ -11,9 +11,9 @@ defmodule MacroCompiler.Optimization.ConstantFolding do
   alias MacroCompiler.Parser.PushCommand
 
 
-  def optimize(ast, symbols_table) do
+  def optimize(ast, %{macros: symbols_table_macro}) do
     tuple_macro_last_write_variables =
-      symbols_table
+      symbols_table_macro
       |> Enum.map(&{&1.macro_write.name, &1.macro_write.last_write_variables})
 
     Process.put(:macro_last_write_variables, tuple_macro_last_write_variables)

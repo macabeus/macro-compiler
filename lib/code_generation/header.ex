@@ -19,16 +19,24 @@ defmodule MacroCompiler.CodeGeneration.Header do
   alias MacroCompiler.Parser.KeysCommand
   alias MacroCompiler.Parser.ValuesCommand
 
-  def generate(node, _symbolsTables) do
+  def generate(node, %{special_variables: special_variables}) do
     []
     |> Enum.concat(["package macroCompiled;"])
     |> Enum.concat(start_find_requirements(node))
+    |> Enum.concat(import_special_variables(special_variables))
     |> Enum.concat([
       """
       Plugins::register('macroCompiled', 'Compiled version of eventMacro.txt', \&on_unload);
       sub on_unload { }
       """
     ])
+  end
+
+  defp import_special_variables(special_variables) do
+    special_variables
+    |> Enum.map(fn
+      "$.zeny" -> "use Globals qw($char);"
+    end)
   end
 
   defp start_find_requirements(node) do

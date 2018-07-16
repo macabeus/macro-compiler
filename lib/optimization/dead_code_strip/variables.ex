@@ -1,14 +1,14 @@
 defmodule MacroCompiler.Optimization.DeadCodeStrip.Variables do
-  def validate_variables(symbol_table) do
+  def validate_variables(%{macros: symbols_table_macro}) do
     variables_read =
-      symbol_table
+      symbols_table_macro
       |> Enum.map(&find_variables_read/1)
       |> List.flatten
       |> MapSet.new
       |> MapSet.delete(nil)
 
     variables_write =
-      symbol_table
+      symbols_table_macro
       |> Enum.map(&find_variables_write/1)
       |> List.flatten
       |> MapSet.new

@@ -1,13 +1,13 @@
 defmodule MacroCompiler.SemanticAnalysis.Validates.Macros do
-  def validate_macros(symbol_table) do
+  def validate_macros(%{macros: symbols_table_macros}) do
     macros_read =
-      symbol_table
+      symbols_table_macros
       |> Enum.map(&find_macros_read/1)
       |> List.flatten
       |> Enum.reject(&is_nil/1)
 
     macros_write =
-      symbol_table
+      symbols_table_macros
       |> Enum.map(&find_macros_write/1)
       |> Enum.reject(&is_nil/1)
 
