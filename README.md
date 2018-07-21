@@ -1,11 +1,7 @@
-<h1 align="center"> MacroCompiler </h1> <br>
-<p align="center">
-  <a href="">
-    <img alt="Logo" src="https://raw.githubusercontent.com/macabeus/macro-compiler/master/docs/logo-small.png">
-  </a>
-</p>
+<img src="https://raw.githubusercontent.com/macabeus/macro-compiler/master/docs/logo-small.png" align="right" />
 
->The best way to create macros.
+# MacroCompiler
+> The best way to create macros.
 
 [![Build Status](https://travis-ci.com/macabeus/macro-compiler.svg?branch=master)](https://travis-ci.com/macabeus/macro-compiler)
 
