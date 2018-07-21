@@ -26,17 +26,17 @@ defmodule MacroCompiler.SemanticAnalysis do
   alias MacroCompiler.Parser.Condition
 
   alias MacroCompiler.SemanticAnalysis.LatestVariableWrites
-  alias MacroCompiler.SemanticAnalysis.ListSpecialVariables
+  alias MacroCompiler.SemanticAnalysis.SymbolsTable
 
   import MacroCompiler.SemanticAnalysis.Validates.Variables
   import MacroCompiler.SemanticAnalysis.Validates.Macros
 
   def build_symbols_table(ast) do
-    st =
+    symbols_table =
       symbols_table(ast)
       |> List.flatten
 
-    %{macros: st, special_variables: ListSpecialVariables.build(st)}
+    %{macros: symbols_table, special_variables: SymbolsTable.list_special_variables(symbols_table)}
   end
 
   def run_validates(symbols_table) do

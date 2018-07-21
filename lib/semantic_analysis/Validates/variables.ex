@@ -1,38 +1,36 @@
 defmodule MacroCompiler.SemanticAnalysis.Validates.Variables do
+  alias MacroCompiler.SemanticAnalysis.SymbolsTable
+
   def validate_variables(%{macros: symbols_table_macros, special_variables: special_variables}) do
     variables_read =
       symbols_table_macros
-      |> Enum.map(&find_variables_read/1)
-      |> List.flatten
-      |> Enum.reject(&is_nil/1)
-      |> Enum.reject(&Enum.member?(special_variables, &1.name))
+      |> SymbolsTable.list_read_variables
+      |> Enum.reject(fn {name , _} -> Enum.member?(special_variables, name) end)
 
     variables_read_names =
       variables_read
-      |> Enum.map(&Map.get(&1, :name))
+      |> Enum.map(fn {name, _} -> name end)
 
 
     variables_write =
       symbols_table_macros
-      |> Enum.map(&find_variables_write/1)
-      |> List.flatten
-      |> Enum.reject(&is_nil/1)
+      |> SymbolsTable.list_written_variables
 
     variables_write_names =
       variables_write
-      |> Enum.map(&Map.get(&1, :name))
+      |> Enum.map(fn {name, _} -> name end)
 
 
     messages_variables_read =
       variables_read
-      |> Enum.reject(&Enum.member?(variables_write_names, &1.name))
-      |> Enum.reduce(%{}, fn(variable, acc) ->
-        case Map.fetch(acc, variable.name) do
+      |> Enum.reject(fn {name, _} -> Enum.member?(variables_write_names, name) end)
+      |> Enum.reduce(%{}, fn({name, metadata}, acc) ->
+        case Map.fetch(acc, name) do
           {:ok, metadatas} ->
-            %{acc | variable.name => [variable.metadata | metadatas]}
+            %{acc | name => [metadata | metadatas]}
 
           :error ->
-            Map.put(acc, variable.name, [variable.metadata])
+            Map.put(acc, name, [metadata])
         end
       end)
       |> Enum.map(fn({variable_name, metadatas}) -> %{
@@ -43,14 +41,14 @@ defmodule MacroCompiler.SemanticAnalysis.Validates.Variables do
 
     messages_variables_write =
       variables_write
-      |> Enum.reject(&Enum.member?(variables_read_names, &1.name))
-      |> Enum.reduce(%{}, fn(variable, acc) ->
-        case Map.fetch(acc, variable.name) do
+      |> Enum.reject(fn {name, _} -> Enum.member?(variables_read_names, name) end)
+      |> Enum.reduce(%{}, fn({name, metadata}, acc) ->
+        case Map.fetch(acc, name) do
           {:ok, metadatas} ->
-            %{acc | variable.name => [variable.metadata | metadatas]}
+            %{acc | name => [metadata | metadatas]}
 
           :error ->
-            Map.put(acc, variable.name, [variable.metadata])
+            Map.put(acc, name, [metadata])
         end
       end)
       |> Enum.map(fn({variable_name, metadatas}) -> %{
@@ -60,55 +58,5 @@ defmodule MacroCompiler.SemanticAnalysis.Validates.Variables do
       } end)
 
     [messages_variables_read, messages_variables_write]
-  end
-
-  defp find_variables_read(stage) do
-    case stage do
-      %{macro_write: %{block: block}} ->
-        Enum.map(block, &find_variables_read/1)
-
-      %{variable_read: x, variable_name: {name, metadata}} when is_list(x) ->
-        [
-          %{name: name, metadata: metadata},
-          Enum.map(x, &find_variables_read/1)
-        ]
-
-      %{variable_read: x} when is_list(x) ->
-        Enum.map(x, &find_variables_read/1)
-
-      x when is_list(x) ->
-        Enum.map(x, &find_variables_read/1)
-
-      %{variable_read: x} when is_map(x) ->
-        find_variables_read(x)
-
-      %{variable_name: {name, metadata}} ->
-        %{name: name, metadata: metadata}
-
-      _ ->
-        nil
-    end
-  end
-
-  defp find_variables_write(stage) do
-    case stage do
-      %{macro_write: %{block: block}} ->
-        Enum.map(block, &find_variables_write/1)
-
-      %{variable_write: x} when is_list(x) ->
-        Enum.map(x, &find_variables_write/1)
-
-      x when is_list(x) ->
-        Enum.map(x, &find_variables_write/1)
-
-      %{variable_write: x} when is_map(x) ->
-        find_variables_write(x)
-
-      %{variable_name: {name, metadata}} ->
-        %{name: name, metadata: metadata}
-
-      _ ->
-        nil
-    end
   end
 end

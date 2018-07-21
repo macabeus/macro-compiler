@@ -1,25 +1,24 @@
 defmodule MacroCompiler.SemanticAnalysis.Validates.Macros do
+  alias MacroCompiler.SemanticAnalysis.SymbolsTable
+
   def validate_macros(%{macros: symbols_table_macros}) do
     macros_read =
       symbols_table_macros
-      |> Enum.map(&find_macros_read/1)
-      |> List.flatten
-      |> Enum.reject(&is_nil/1)
+      |> SymbolsTable.list_read_macros
 
     macros_write =
       symbols_table_macros
-      |> Enum.map(&find_macros_write/1)
-      |> Enum.reject(&is_nil/1)
+      |> SymbolsTable.list_written_macros
 
     macros_read
-    |> Enum.reject(&Enum.member?(macros_write, &1.name))
-    |> Enum.reduce(%{}, fn(macro, acc) ->
+    |> Enum.reject(fn {macro, _metadata} -> Enum.member?(macros_write, macro.name) end)
+    |> Enum.reduce(%{}, fn({macro, metadata}, acc) ->
       case Map.fetch(acc, macro.name) do
         {:ok, metadatas} ->
-          %{acc | macro.name => [macro.metadata | metadatas]}
+          %{acc | macro.name => [metadata | metadatas]}
 
         :error ->
-          Map.put(acc, macro.name, [macro.metadata])
+          Map.put(acc, macro.name, [metadata])
       end
     end)
     |> Enum.map(fn({macro_name, metadatas}) -> %{
@@ -27,31 +26,5 @@ defmodule MacroCompiler.SemanticAnalysis.Validates.Macros do
       metadatas: metadatas,
       message: ["macro ", :red, macro_name, :default_color, " is called but it has never been written."]
     } end)
-  end
-
-  defp find_macros_read(stage) do
-    case stage do
-      x when is_list(x) ->
-        Enum.map(x, &find_macros_read/1)
-
-      %{macro_write: %{block: block}} ->
-        find_macros_read(block)
-
-      %{macro_read: {%{name: name, params: _params}, metadata}} ->
-        %{name: name, metadata: metadata}
-
-      _ ->
-        nil
-    end
-  end
-
-  defp find_macros_write(stage) do
-    case stage do
-      %{macro_write: %{name: name}} ->
-        name
-
-      _ ->
-        nil
-    end
   end
 end
