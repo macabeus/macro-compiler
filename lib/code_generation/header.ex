@@ -19,7 +19,9 @@ defmodule MacroCompiler.CodeGeneration.Header do
   alias MacroCompiler.Parser.KeysCommand
   alias MacroCompiler.Parser.ValuesCommand
 
-  def generate(node, %{special_variables: special_variables}) do
+  alias MacroCompiler.SemanticAnalysis.SymbolsTable
+
+  def generate(node, %{macros: symbols_table, special_variables: special_variables}) do
     []
     |> Enum.concat(["package macroCompiled;"])
     |> Enum.concat(start_find_requirements(node))
@@ -30,6 +32,7 @@ defmodule MacroCompiler.CodeGeneration.Header do
       sub on_unload { }
       """
     ])
+    |> Enum.concat(commands_register(symbols_table))
   end
 
   defp import_special_variables(special_variables) do
@@ -37,6 +40,26 @@ defmodule MacroCompiler.CodeGeneration.Header do
     |> Enum.map(fn
       "$.zeny" -> "use Globals qw($char);"
     end)
+  end
+
+  defp commands_register(symbols_table) do
+    macros_hash_value =
+      symbols_table
+      |> SymbolsTable.list_written_macros
+      |> Enum.map(&"#{&1} => \\&macro_#{&1},")
+
+    [
+      "Commands::register(",
+      "['macroCompiled', 'MacroCompiled plugin', \\&commandHandler]",
+      ");",
+      "my %macros = (",
+      macros_hash_value,
+      ");",
+      "sub commandHandler {",
+      "  my $macroFunc = $macros{$_[1]};",
+      "  &$macroFunc;",
+      "}"
+    ]
   end
 
   defp start_find_requirements(node) do
