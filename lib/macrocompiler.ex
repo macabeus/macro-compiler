@@ -30,7 +30,7 @@ defmodule MacroCompiler do
 
       []
       |> Enum.concat(CodeGenerationHeader.generate(optimized_ast, symbols_table))
-      |> Enum.concat(CodeGenerationBody.start_generate(optimized_ast, symbols_table))
+      |> Enum.concat(CodeGenerationBody.start_generate(optimized_ast))
       |> Enum.concat(CodeGenerationFooter.generate())
 
     rescue

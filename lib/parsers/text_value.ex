@@ -6,7 +6,6 @@ defmodule MacroCompiler.Parser.TextValue do
   alias MacroCompiler.Parser.ScalarVariable
   alias MacroCompiler.Parser.ArrayVariable
   alias MacroCompiler.Parser.HashVariable
-  alias MacroCompiler.Parser.PostfixIf
 
   @enforce_keys [:values]
   defstruct [:values]
