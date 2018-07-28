@@ -27,43 +27,43 @@ defmodule MacroCompiler.CodeGeneration.Body do
   alias MacroCompiler.Parser.Condition
   alias MacroCompiler.Parser.SingleCheck
 
-  def start_generate(block, symbolsTable) do
-    Enum.map(block, &(generate(&1, symbolsTable)))
+  def start_generate(block) do
+    Enum.map(block, &(generate(&1)))
     |> List.flatten
   end
 
-  defp generate({_node, %{ignore: true}}, symbolsTable) do
+  defp generate({_node, %{ignore: true}}) do
 
   end
 
-  defp generate({node, _metadata}, symbolsTable) do
-    generate(node, symbolsTable)
+  defp generate({node, _metadata}) do
+    generate(node)
   end
 
-  defp generate(block, symbolsTable) when is_list(block) do
-    Enum.map(block, &(generate(&1, symbolsTable)))
+  defp generate(block) when is_list(block) do
+    Enum.map(block, &(generate(&1)))
   end
 
 
-  defp generate(%Macro{name: name, block: block}, symbolsTable) do
+  defp generate(%Macro{name: name, block: block}) do
     [
       "sub macro_#{name} {",
-      generate(block, symbolsTable),
+      generate(block),
       "}"
     ]
   end
 
-  defp generate(%TextValue{values: values}, symbolsTable) do
+  defp generate(%TextValue{values: values}) do
     values = values
     |> Enum.map(&(
       case &1 do
         {%ScalarVariable{array_position: nil}, _metadata} ->
-          generate(&1, symbolsTable)
+          generate(&1)
 
-        {%ScalarVariable{array_position: array_position}, _metadata} ->
+        {%ScalarVariable{array_position: _array_position}, _metadata} ->
           [
             "\".",
-            generate(&1, symbolsTable),
+            generate(&1),
             ".\""
           ]
 
@@ -85,7 +85,7 @@ defmodule MacroCompiler.CodeGeneration.Body do
     "\"#{values}\""
   end
 
-  defp generate(%CallCommand{macro: macro, params: params}, _symbolsTable) do
+  defp generate(%CallCommand{macro: macro, params: params}) do
     params =
       params
       |> Enum.map(&("\"#{&1}\""))
@@ -94,27 +94,27 @@ defmodule MacroCompiler.CodeGeneration.Body do
     "&macro_#{macro}(#{params});"
   end
 
-  defp generate(%DoCommand{text: text}, symbolsTable) do
+  defp generate(%DoCommand{text: text}) do
     [
       "Commands::run(",
-      generate(text, symbolsTable),
+      generate(text),
       ");"
     ]
   end
 
-  defp generate(%LogCommand{text: text}, symbolsTable) do
+  defp generate(%LogCommand{text: text}) do
     [
       "message ",
-      generate(text, symbolsTable),
+      generate(text),
       ".\"\\n\";"
     ]
   end
 
-  defp generate(%ScalarVariable{name: ".zeny"}, _symbolsTable) do
+  defp generate(%ScalarVariable{name: ".zeny"}) do
     "$char->{zeny}"
   end
 
-  defp generate(%ScalarVariable{name: name, array_position: array_position, hash_position: hash_position}, symbolsTable) do
+  defp generate(%ScalarVariable{name: name, array_position: array_position, hash_position: hash_position}) do
     case {name, array_position, hash_position} do
       {name, nil, nil} ->
         "$#{name}"
@@ -122,7 +122,7 @@ defmodule MacroCompiler.CodeGeneration.Body do
       {name, array_position, nil} ->
         [
           "$#{name}[",
-          generate(array_position, symbolsTable),
+          generate(array_position),
           "]"
         ]
 
@@ -131,155 +131,155 @@ defmodule MacroCompiler.CodeGeneration.Body do
     end
   end
 
-  defp generate(%ScalarAssignmentCommand{scalar_variable: scalar_variable, scalar_value: scalar_value}, symbolsTable) do
+  defp generate(%ScalarAssignmentCommand{scalar_variable: scalar_variable, scalar_value: scalar_value}) do
     [
-      generate(scalar_variable, symbolsTable),
+      generate(scalar_variable),
       " = ",
-      generate(scalar_value, symbolsTable),
+      generate(scalar_value),
       ";"
     ]
   end
 
-  defp generate(%ArrayVariable{name: name}, _symbolsTable) do
+  defp generate(%ArrayVariable{name: name}) do
     "@#{name}"
   end
 
-  defp generate(%ArrayAssignmentCommand{array_variable: array_variable, texts: texts}, symbolsTable) do
+  defp generate(%ArrayAssignmentCommand{array_variable: array_variable, texts: texts}) do
     texts =
       texts
-      |> Enum.map(&(generate(&1, symbolsTable)))
+      |> Enum.map(&(generate(&1)))
       |> Enum.join(",")
 
     [
-      generate(array_variable, symbolsTable),
+      generate(array_variable),
       " = (#{texts});"
     ]
   end
 
-  defp generate(%HashVariable{name: name}, _symbolsTable) do
+  defp generate(%HashVariable{name: name}) do
     "%#{name}"
   end
 
-  defp generate(%HashAssignmentCommand{hash_variable: hash_variable, keystexts: keystexts}, symbolsTable) do
+  defp generate(%HashAssignmentCommand{hash_variable: hash_variable, keystexts: keystexts}) do
     keystexts =
       keystexts
-      |> Enum.map(&("\"#{Enum.at(&1, 0)}\" => #{generate(Enum.at(&1, 1), symbolsTable)}"))
+      |> Enum.map(&("\"#{Enum.at(&1, 0)}\" => #{generate(Enum.at(&1, 1))}"))
       |> Enum.join(",")
 
     [
-      generate(hash_variable, symbolsTable),
+      generate(hash_variable),
       " = (#{keystexts});"
     ]
   end
 
-  defp generate(%DeleteCommand{scalar_variable: scalar_variable}, symbolsTable) do
+  defp generate(%DeleteCommand{scalar_variable: scalar_variable}) do
     [
       "delete ",
-      generate(scalar_variable, symbolsTable),
+      generate(scalar_variable),
       ";"
     ]
   end
 
-  defp generate(%KeysCommand{array_variable: array_variable, param_hash_variable: param_hash_variable}, symbolsTable) do
+  defp generate(%KeysCommand{array_variable: array_variable, param_hash_variable: param_hash_variable}) do
     [
-      generate(array_variable, symbolsTable),
+      generate(array_variable),
       "= keys ",
-      generate(param_hash_variable, symbolsTable),
+      generate(param_hash_variable),
       ";"
     ]
   end
 
-  defp generate(%ValuesCommand{array_variable: array_variable, param_hash_variable: param_hash_variable}, symbolsTable) do
+  defp generate(%ValuesCommand{array_variable: array_variable, param_hash_variable: param_hash_variable}) do
     [
-      generate(array_variable, symbolsTable),
+      generate(array_variable),
       "= values ",
-      generate(param_hash_variable, symbolsTable),
+      generate(param_hash_variable),
       ";"
     ]
   end
 
-  defp generate(%UndefCommand{scalar_variable: scalar_variable}, symbolsTable) do
+  defp generate(%UndefCommand{scalar_variable: scalar_variable}) do
     [
       "undef ",
 
-      generate(scalar_variable, symbolsTable),
+      generate(scalar_variable),
 
       ";"
     ]
   end
 
-  defp generate(%IncrementCommand{scalar_variable: scalar_variable}, symbolsTable) do
+  defp generate(%IncrementCommand{scalar_variable: scalar_variable}) do
     [
-      generate(scalar_variable, symbolsTable),
+      generate(scalar_variable),
 
       "++;"
     ]
   end
 
-  defp generate(%DecrementCommand{scalar_variable: scalar_variable}, symbolsTable) do
+  defp generate(%DecrementCommand{scalar_variable: scalar_variable}) do
     [
-      generate(scalar_variable, symbolsTable),
+      generate(scalar_variable),
 
       "--;"
     ]
   end
 
-  defp generate(%PauseCommand{seconds: _seconds}, _symbolsTable) do
+  defp generate(%PauseCommand{seconds: _seconds}) do
     # TODO
   end
 
-  defp generate(%PushCommand{array_variable: array_variable, text: text}, symbolsTable) do
+  defp generate(%PushCommand{array_variable: array_variable, text: text}) do
     [
       "push ",
-      generate(array_variable, symbolsTable),
+      generate(array_variable),
       ",",
-      generate(text, symbolsTable),
+      generate(text),
       ";"
     ]
   end
 
-  defp generate(%PopCommand{array_variable: array_variable}, symbolsTable) do
+  defp generate(%PopCommand{array_variable: array_variable}) do
     [
       "pop ",
-      generate(array_variable, symbolsTable),
+      generate(array_variable),
       ";"
     ]
   end
 
-  defp generate(%ShiftCommand{array_variable: array_variable}, symbolsTable) do
+  defp generate(%ShiftCommand{array_variable: array_variable}) do
     [
       "shift ",
-      generate(array_variable, symbolsTable),
+      generate(array_variable),
       ";"
     ]
   end
 
-  defp generate(%UnshiftCommand{array_variable: array_variable, text: text}, symbolsTable) do
+  defp generate(%UnshiftCommand{array_variable: array_variable, text: text}) do
     [
       "unshift ",
-      generate(array_variable, symbolsTable),
+      generate(array_variable),
       ",",
-      generate(text, symbolsTable),
+      generate(text),
       ";"
     ]
   end
 
-  defp generate(%RandCommand{min: min, max: max}, symbolsTable) do
+  defp generate(%RandCommand{min: min, max: max}) do
     [
       "(",
-      generate(min, symbolsTable),
+      generate(min),
       " + int(rand(1 + ",
-      generate(max, symbolsTable),
+      generate(max),
       " - ",
-      generate(min, symbolsTable),
+      generate(min),
       ")))"
     ]
   end
 
-  defp generate(%RandomCommand{values: values}, symbolsTable) do
+  defp generate(%RandomCommand{values: values}) do
     valuesMapped =
       values
-      |> Enum.map(&generate(&1, symbolsTable))
+      |> Enum.map(&generate(&1))
       |> Enum.join(",")
 
     [
@@ -289,31 +289,31 @@ defmodule MacroCompiler.CodeGeneration.Body do
     ]
   end
 
-  defp generate(%PostfixIf{condition: condition, body: body}, symbolsTable) do
+  defp generate(%PostfixIf{condition: condition, body: body}) do
     [
       "if (",
-      generate(condition, symbolsTable),
+      generate(condition),
       ") {",
-      generate(body, symbolsTable),
+      generate(body),
       "}"
     ]
   end
 
-  defp generate(%Condition{scalar_variable: scalar_variable, operator: operator, value: value}, symbolsTable) do
+  defp generate(%Condition{scalar_variable: scalar_variable, operator: operator, value: value}) do
     [
-      generate(scalar_variable, symbolsTable),
+      generate(scalar_variable),
       operator,
-      generate(value, symbolsTable)
+      generate(value)
     ]
   end
 
-  defp generate(%SingleCheck{scalar_variable: scalar_variable}, symbolsTable) do
+  defp generate(%SingleCheck{scalar_variable: scalar_variable}) do
     [
-      generate(scalar_variable, symbolsTable)
+      generate(scalar_variable)
     ]
   end
 
-  defp generate(_undefinedNode, _symbolsTable) do
+  defp generate(_undefinedNode) do
 
   end
 end

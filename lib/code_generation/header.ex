@@ -162,7 +162,7 @@ defmodule MacroCompiler.CodeGeneration.Header do
       {name, nil} ->
         %{variable: "$#{name}"}
 
-      {name, hash_position} ->
+      {name, _hash_position} ->
         %{variable: "%#{name}"}
     end
   end
