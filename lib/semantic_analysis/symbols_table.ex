@@ -85,6 +85,16 @@ defmodule MacroCompiler.SemanticAnalysis.SymbolsTable do
     String.slice(variable_name, 1..1) == "."
   end
 
+  def filter_special_variable(variable_list) do
+    variable_list
+    |> Enum.filter(fn {name, _metadata} -> is_special_variable(name) end)
+  end
+
+  def reject_special_variable(variable_list) do
+    variable_list
+    |> Enum.reject(fn {name, _metadata} -> is_special_variable(name) end)
+  end
+
   defp filter_nil(list) do
     list
     |> List.flatten
