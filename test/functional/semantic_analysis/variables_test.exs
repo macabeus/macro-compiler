@@ -30,6 +30,31 @@ defmodule MacroCompiler.Test.Functional.SemanticAnalysis.Variables do
     """
   )
 
+  test_semantic_warning(
+     "should warning when write a variable that was never read",
+     """
+       macro Test {
+         $scalar = value
+         @array = ()
+         %hash = ()
+       }
+     """,
+     [
+       [
+         message: ["variable ", :red, "$scalar", :default_color, " is write but it has never read."],
+         metadatas: [%MacroCompiler.Parser.Metadata{ignore: nil, line: 2, offset: 4}]
+       ],
+       [
+         message: ["variable ", :red, "%hash", :default_color, " is write but it has never read."],
+         metadatas: [%MacroCompiler.Parser.Metadata{ignore: nil, line: 2, offset: 40}]
+       ],
+       [
+         message: ["variable ", :red, "@array", :default_color, " is write but it has never read."],
+         metadatas: [%MacroCompiler.Parser.Metadata{ignore: nil, line: 2, offset: 24}]
+       ]
+     ]
+  )
+
   test_semantic_error(
     "should fail when try to read a variable that has never been written",
     """

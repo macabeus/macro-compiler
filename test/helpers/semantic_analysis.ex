@@ -30,6 +30,21 @@ defmodule MacroCompiler.Test.Helper.SemanticAnalysis do
     end
   end
 
+  defmacro test_semantic_warning(description, code, compare_list) do
+    quote do
+      test unquote(description) do
+        validates_result = get_validates_result(unquote(code))
+
+        List.zip([validates_result, unquote(compare_list)])
+        |> Enum.each(fn {validate_result, [message: message, metadatas: metadatas]} ->
+          assert validate_result.message == message
+          assert validate_result.metadatas == metadatas
+          assert validate_result.type == :warning
+       end)
+      end
+    end
+  end
+
   defmacro test_semantic_error(description, code, compare_list) do
     quote do
       test unquote(description) do
