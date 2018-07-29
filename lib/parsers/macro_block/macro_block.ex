@@ -63,7 +63,7 @@ defmodule MacroCompiler.Parser.MacroBlock do
 
      fn
        [node, nil] -> node
-       [node_command, {node_postfix, postfix_metadata}] -> {%{node_postfix | body: node_command}, postfix_metadata}
+       [node_command, {node_postfix, postfix_metadata}] -> {%{node_postfix | block: [node_command]}, postfix_metadata}
        [] -> nil
        [nil] -> nil
      end)

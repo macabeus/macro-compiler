@@ -290,12 +290,12 @@ defmodule MacroCompiler.CodeGeneration.Body do
     ]
   end
 
-  defp generate(%PostfixIf{condition: condition, body: body}) do
+  defp generate(%PostfixIf{condition: condition, block: block}) do
     [
       "if (",
       generate(condition),
       ") {",
-      generate(body),
+      generate(block),
       "}"
     ]
   end
