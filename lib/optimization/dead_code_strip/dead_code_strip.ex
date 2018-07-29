@@ -4,11 +4,26 @@ defmodule MacroCompiler.Optimization.DeadCodeStrip do
   alias MacroCompiler.Parser.ArrayVariable
   alias MacroCompiler.Parser.HashVariable
 
-  alias MacroCompiler.Optimization.DeadCodeStrip.Variables, as: DeadCodeStripVariables
+  alias MacroCompiler.SemanticAnalysis.SymbolsTable
 
-  def optimize(ast, symbols_table) do
+  def optimize(ast, %{macros: symbols_table_macros}) do
+    variables_read =
+      symbols_table_macros
+      |> SymbolsTable.list_read_variables
+      |> Enum.map(fn {name, _} -> name end)
+      |> MapSet.new
+
+    variables_written =
+      symbols_table_macros
+      |> SymbolsTable.list_written_variables
+      |> Enum.map(fn {name, _} -> name end)
+      |> MapSet.new
+
+   variables_never_read =
+      MapSet.difference(variables_written, variables_read)
+
     tips = %{
-      variables_never_read: DeadCodeStripVariables.validate_variables(symbols_table)
+      variables_never_read: variables_never_read
     }
 
     run(ast, tips)
