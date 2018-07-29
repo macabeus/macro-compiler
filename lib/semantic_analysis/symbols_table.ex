@@ -75,9 +75,9 @@ defmodule MacroCompiler.SemanticAnalysis.SymbolsTable do
 
     if (length(a) > 0) do
       acc = [acc | a]
-      [acc | list(operation, occurrences, acc)]
+      list(operation, occurrences, acc)
     else
-      []
+      acc
     end
   end
 
