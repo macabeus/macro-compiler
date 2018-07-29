@@ -39,7 +39,12 @@ defmodule MacroCompiler.Optimization.DeadCodeStrip do
 
     case run_result do
       {node, true} ->
-        {node, %{metadata | ignore: true}}
+        case Process.get(:no_keep_ignored_node) do
+          true ->
+            nil
+          _ ->
+            {node, %{metadata | ignore: true}}
+        end
 
       {node, false} ->
         {node, metadata}
@@ -48,6 +53,7 @@ defmodule MacroCompiler.Optimization.DeadCodeStrip do
 
   defp run(block, tips) when is_list(block) do
     Enum.map(block, fn block -> run(block, tips) end)
+    |> Enum.reject(&is_nil/1)
   end
 
   defp run(%Macro{name: name, block: block}, tips) do

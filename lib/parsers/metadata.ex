@@ -9,6 +9,11 @@ defmodule MacroCompiler.Parser.Metadata do
   defstruct [:line, :offset, :ignore]
 
   defparser getMetadata(%ParserState{status: :ok, line: line, column: col, results: results} = state) do
-    %{state | :results => [%Metadata{line: line, offset: col} | results]}
+    case Process.get(:no_metadata) do
+      true ->
+        %{state | :results => [%Metadata{line: 0, offset: 0} | results]}
+      _ ->
+        %{state | :results => [%Metadata{line: line, offset: col} | results]}
+    end
   end
 end
