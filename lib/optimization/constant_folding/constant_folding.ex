@@ -22,7 +22,7 @@ defmodule MacroCompiler.Optimization.ConstantFolding do
       ast
       |> Enum.map(
         fn {%Macro{block: block} = node, metadata} ->
-          {%{node | block: optimize_block(block)}, metadata}
+          {%{node | block: optimize_block(block).optimized_block}, metadata}
         end
       )
 
@@ -31,20 +31,47 @@ defmodule MacroCompiler.Optimization.ConstantFolding do
     optimized_ast
   end
 
-  defp optimize_block(block) do
-    {optimized_block, _} =
+  defp optimize_block(block, initial_variables_context\\%{}) do
+    {optimized_block, final_variables_context} =
       Enum.reduce(
         block,
-        {[], %{}},
-        fn (current_node, {nodes, variables_context}) ->
-          {node, updated_new_variables_context} =
-            run(current_node, variables_context)
+        {[], initial_variables_context},
+        fn
+          ({%{block: block} = block_node, metadata}, {nodes, variables_context}) ->
+            %{
+              optimized_block: optimized_block,
+              variables_writen: variables_writen
+            } = optimize_block(block, variables_context)
 
-          {[node | nodes], updated_new_variables_context}
+            {_, variables_context} =
+              variables_context
+              |> Map.split(variables_writen)
+
+            optimized_block_node = %{block_node | block: optimized_block}
+
+            {[{optimized_block_node, metadata} | nodes], variables_context}
+
+          (current_node, {nodes, variables_context}) ->
+            {node, updated_variables_context} =
+              run(current_node, variables_context)
+
+            {[node | nodes], updated_variables_context}
         end
       )
 
-    Enum.reverse(optimized_block)
+    variable_context_differences =
+      initial_variables_context
+      |> Enum.reject(fn {var_name, var_value} ->
+        Map.get(final_variables_context, var_name) == var_value
+      end)
+      |> Enum.map(fn {var_name, _var_value} ->
+        var_name
+      end)
+
+    %{
+      optimized_block: Enum.reverse(optimized_block),
+      variables_writen: variable_context_differences
+    }
   end
 
   defp run({_node, %{ignore: true}} = node, variables_context) do

@@ -1,5 +1,4 @@
 defmodule MacroCompiler.Optimization.DeadCodeStrip do
-  alias MacroCompiler.Parser.Macro
   alias MacroCompiler.Parser.ScalarVariable
   alias MacroCompiler.Parser.ArrayVariable
   alias MacroCompiler.Parser.HashVariable
@@ -56,8 +55,11 @@ defmodule MacroCompiler.Optimization.DeadCodeStrip do
     |> Enum.reject(&is_nil/1)
   end
 
-  defp run(%Macro{name: name, block: block}, tips) do
-    {%Macro{name: name, block: run(block, tips)}, false}
+  defp run(%{block: block} = node, tips) do
+    {
+      %{node | block: run(block, tips)},
+      false
+    }
   end
 
   defp run(

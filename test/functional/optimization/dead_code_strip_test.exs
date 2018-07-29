@@ -33,5 +33,25 @@ defmodule MacroCompiler.Test.Functional.DeadCodeStrip do
       }
     """
   )
+
+  test_different_ast(
+    "Should keep variable assignment if it is read in an 'if' block",
+    """
+      macro Test {
+        $foo = 1
+
+        if (1) {
+          log $foo
+        }
+      }
+    """,
+    """
+      macro Test {
+        if (1) {
+          log $foo
+        }
+      }
+    """
+  )
 end
 

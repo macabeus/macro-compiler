@@ -24,6 +24,7 @@ defmodule MacroCompiler.Parser.MacroBlock do
   alias MacroCompiler.Parser.ValuesCommand
   alias MacroCompiler.Parser.BlankSpaces
   alias MacroCompiler.Parser.PostfixIf
+  alias MacroCompiler.Parser.IfBlock
 
   def parser() do
     many(
@@ -50,6 +51,7 @@ defmodule MacroCompiler.Parser.MacroBlock do
            DeleteCommand.parser(),
            KeysCommand.parser(),
            ValuesCommand.parser(),
+           IfBlock.parser(),
 
            # If we could not understand the command in this line, and it's not a close-braces,
            # then it's a syntax error
