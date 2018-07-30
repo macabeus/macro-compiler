@@ -1,14 +1,31 @@
 defmodule MacroCompiler.Optimization.DeadCodeStrip do
-  alias MacroCompiler.Parser.Macro
   alias MacroCompiler.Parser.ScalarVariable
   alias MacroCompiler.Parser.ArrayVariable
   alias MacroCompiler.Parser.HashVariable
 
-  alias MacroCompiler.Optimization.DeadCodeStrip.Variables, as: DeadCodeStripVariables
+  alias MacroCompiler.SemanticAnalysis.SymbolsTable
 
-  def optimize(ast, symbols_table) do
+  @ignore_node true
+  @keep_node false
+
+  def optimize(ast, %{macros: symbols_table_macros}) do
+    variables_read =
+      symbols_table_macros
+      |> SymbolsTable.list_read_variables
+      |> Enum.map(fn {name, _} -> name end)
+      |> MapSet.new
+
+    variables_written =
+      symbols_table_macros
+      |> SymbolsTable.list_written_variables
+      |> Enum.map(fn {name, _} -> name end)
+      |> MapSet.new
+
+   variables_never_read =
+      MapSet.difference(variables_written, variables_read)
+
     tips = %{
-      variables_never_read: DeadCodeStripVariables.validate_variables(symbols_table)
+      variables_never_read: variables_never_read
     }
 
     run(ast, tips)
@@ -23,20 +40,29 @@ defmodule MacroCompiler.Optimization.DeadCodeStrip do
     run_result = run(node, tips)
 
     case run_result do
-      {node, true} ->
-        {node, %{metadata | ignore: true}}
+      {node, @ignore_node} ->
+        case Process.get(:no_keep_ignored_node) do
+          true ->
+            nil
+          _ ->
+            {node, %{metadata | ignore: true}}
+        end
 
-      {node, false} ->
+      {node, @keep_node} ->
         {node, metadata}
     end
   end
 
   defp run(block, tips) when is_list(block) do
     Enum.map(block, fn block -> run(block, tips) end)
+    |> Enum.reject(&is_nil/1)
   end
 
-  defp run(%Macro{name: name, block: block}, tips) do
-    {%Macro{name: name, block: run(block, tips)}, false}
+  defp run(%{block: block} = node, tips) do
+    {
+      %{node | block: run(block, tips)},
+      @keep_node
+    }
   end
 
   defp run(
@@ -45,10 +71,10 @@ defmodule MacroCompiler.Optimization.DeadCodeStrip do
   do
     case Enum.member?(variables_never_read, "$#{scalar_name}") do
       true ->
-        {node, true}
+        {node, @ignore_node}
 
       false ->
-        {node, false}
+        {node, @keep_node}
     end
   end
 
@@ -58,10 +84,10 @@ defmodule MacroCompiler.Optimization.DeadCodeStrip do
   do
     case Enum.member?(variables_never_read, "@#{array_name}") do
       true ->
-        {node, true}
+        {node, @ignore_node}
 
       false ->
-        {node, false}
+        {node, @keep_node}
     end
   end
 
@@ -71,14 +97,14 @@ defmodule MacroCompiler.Optimization.DeadCodeStrip do
   do
     case Enum.member?(variables_never_read, "%#{hash_name}") do
       true ->
-        {node, true}
+        {node, @ignore_node}
 
       false ->
-        {node, false}
+        {node, @keep_node}
     end
   end
 
   defp run(undefinedNode, _tips) do
-    {undefinedNode, false}
+    {undefinedNode, @keep_node}
   end
 end

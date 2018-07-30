@@ -15,34 +15,36 @@ defmodule MacroCompiler.Test.Helper.Optimization do
     Optimization.build_ast_optimized(ast, optimization)
   end
 
-  def remove_ignored_nodes(ast) do
-    filter_ignore_nodes = Access.filter(fn {_node, metadata} -> metadata.ignore == true end)
-
-    ast
-    |> update_in([Access.all(), Access.elem(0), Access.key(:block), filter_ignore_nodes], fn _ -> nil end)
-    |> update_in([Access.all(), Access.elem(0), Access.key(:block)], fn nodes -> Enum.reject(nodes, &is_nil/1) end)
-  end
-
-  def remove_metadata(ast) do
-    update_in(ast, [Access.all(), Access.elem(0), Access.key(:block), Access.all()], fn {node, _metadata} -> node end)
-  end
-
   defmacro test_equivalents_ast(description, code_a, code_b) do
     quote do
       test unquote(description) do
+        Process.put(:no_metadata, true)
+        Process.put(:no_keep_ignored_node, true)
+
         ast_a = build_optimized_ast(unquote(code_a), @optimization)
         ast_b = build_optimized_ast(unquote(code_b), @optimization)
 
-        ast_filtered_a =
-          ast_a
-          |> remove_ignored_nodes
-          |> remove_metadata
+        Process.put(:no_metadata, nil)
+        Process.put(:no_keep_ignored_node, nil)
 
-        ast_filtered_b =
-          ast_b
-          |> remove_metadata
+        assert ast_a == ast_b
+      end
+    end
+  end
 
-        assert ast_filtered_a == ast_filtered_b
+  defmacro test_different_ast(description, code_a, code_b) do
+    quote do
+      test unquote(description) do
+        Process.put(:no_metadata, true)
+        Process.put(:no_keep_ignored_node, true)
+
+        ast_a = build_optimized_ast(unquote(code_a), @optimization)
+        ast_b = build_optimized_ast(unquote(code_b), @optimization)
+
+        Process.put(:no_metadata, nil)
+        Process.put(:no_keep_ignored_node, nil)
+
+        assert ast_a != ast_b
       end
     end
   end

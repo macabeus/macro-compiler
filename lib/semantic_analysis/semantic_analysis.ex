@@ -24,6 +24,7 @@ defmodule MacroCompiler.SemanticAnalysis do
   alias MacroCompiler.Parser.RandomCommand
   alias MacroCompiler.Parser.PostfixIf
   alias MacroCompiler.Parser.Condition
+  alias MacroCompiler.Parser.IfBlock
 
   alias MacroCompiler.SemanticAnalysis.LatestVariableWrites
   alias MacroCompiler.SemanticAnalysis.SymbolsTable
@@ -241,11 +242,19 @@ defmodule MacroCompiler.SemanticAnalysis do
     ))
   end
 
-  defp symbols_table({%PostfixIf{condition: condition, body: body}, _metadata}) do
+  defp symbols_table({%PostfixIf{condition: condition, block: block}, _metadata}) do
     [
       %{variable_read: symbols_table(condition)},
-      %{variable_read: symbols_table(body)},
-      %{variable_write: symbols_table(body)}
+      %{variable_read: symbols_table(block)},
+      %{variable_write: symbols_table(block)}
+    ]
+  end
+
+  defp symbols_table({%IfBlock{condition: condition, block: block}, _metadata}) do
+    [
+      %{variable_read: symbols_table(condition)},
+      %{variable_read: symbols_table(block)},
+      %{variable_write: symbols_table(block)}
     ]
   end
 

@@ -24,6 +24,7 @@ defmodule MacroCompiler.Parser.MacroBlock do
   alias MacroCompiler.Parser.ValuesCommand
   alias MacroCompiler.Parser.BlankSpaces
   alias MacroCompiler.Parser.PostfixIf
+  alias MacroCompiler.Parser.IfBlock
 
   def parser() do
     many(
@@ -50,6 +51,7 @@ defmodule MacroCompiler.Parser.MacroBlock do
            DeleteCommand.parser(),
            KeysCommand.parser(),
            ValuesCommand.parser(),
+           IfBlock.parser(),
 
            # If we could not understand the command in this line, and it's not a close-braces,
            # then it's a syntax error
@@ -61,7 +63,7 @@ defmodule MacroCompiler.Parser.MacroBlock do
 
      fn
        [node, nil] -> node
-       [node_command, {node_postfix, postfix_metadata}] -> {%{node_postfix | body: node_command}, postfix_metadata}
+       [node_command, {node_postfix, postfix_metadata}] -> {%{node_postfix | block: [node_command]}, postfix_metadata}
        [] -> nil
        [nil] -> nil
      end)

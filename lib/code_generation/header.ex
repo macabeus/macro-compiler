@@ -1,5 +1,4 @@
 defmodule MacroCompiler.CodeGeneration.Header do
-  alias MacroCompiler.Parser.Macro
   alias MacroCompiler.Parser.DoCommand
   alias MacroCompiler.Parser.LogCommand
   alias MacroCompiler.Parser.UndefCommand
@@ -87,7 +86,7 @@ defmodule MacroCompiler.CodeGeneration.Header do
     Enum.map(block, &(find_requirements(&1)))
   end
 
-  defp find_requirements(%Macro{name: _name, block: block}) do
+  defp find_requirements(%{block: block}) do
     find_requirements(block)
   end
 

@@ -9,7 +9,7 @@ defmodule MacroCompiler.Parser.PostfixIf do
   alias MacroCompiler.Parser.Condition
 
   @enforce_keys [:condition]
-  defstruct [:condition, :body]
+  defstruct [:condition, :block]
 
   parser_command do
     sequence([
