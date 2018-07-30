@@ -5,6 +5,9 @@ defmodule MacroCompiler.Optimization.DeadCodeStrip do
 
   alias MacroCompiler.SemanticAnalysis.SymbolsTable
 
+  @ignore_node true
+  @keep_node false
+
   def optimize(ast, %{macros: symbols_table_macros}) do
     variables_read =
       symbols_table_macros
@@ -37,7 +40,7 @@ defmodule MacroCompiler.Optimization.DeadCodeStrip do
     run_result = run(node, tips)
 
     case run_result do
-      {node, true} ->
+      {node, @ignore_node} ->
         case Process.get(:no_keep_ignored_node) do
           true ->
             nil
@@ -45,7 +48,7 @@ defmodule MacroCompiler.Optimization.DeadCodeStrip do
             {node, %{metadata | ignore: true}}
         end
 
-      {node, false} ->
+      {node, @keep_node} ->
         {node, metadata}
     end
   end
@@ -58,7 +61,7 @@ defmodule MacroCompiler.Optimization.DeadCodeStrip do
   defp run(%{block: block} = node, tips) do
     {
       %{node | block: run(block, tips)},
-      false
+      @keep_node
     }
   end
 
@@ -68,10 +71,10 @@ defmodule MacroCompiler.Optimization.DeadCodeStrip do
   do
     case Enum.member?(variables_never_read, "$#{scalar_name}") do
       true ->
-        {node, true}
+        {node, @ignore_node}
 
       false ->
-        {node, false}
+        {node, @keep_node}
     end
   end
 
@@ -81,10 +84,10 @@ defmodule MacroCompiler.Optimization.DeadCodeStrip do
   do
     case Enum.member?(variables_never_read, "@#{array_name}") do
       true ->
-        {node, true}
+        {node, @ignore_node}
 
       false ->
-        {node, false}
+        {node, @keep_node}
     end
   end
 
@@ -94,14 +97,14 @@ defmodule MacroCompiler.Optimization.DeadCodeStrip do
   do
     case Enum.member?(variables_never_read, "%#{hash_name}") do
       true ->
-        {node, true}
+        {node, @ignore_node}
 
       false ->
-        {node, false}
+        {node, @keep_node}
     end
   end
 
   defp run(undefinedNode, _tips) do
-    {undefinedNode, false}
+    {undefinedNode, @keep_node}
   end
 end
