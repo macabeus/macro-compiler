@@ -15,6 +15,10 @@ defmodule MacroCompiler.Test.E2e.IfBlock do
       if ($value) {
         log should can use a variable
       }
+
+      if ($value == 1) {
+        log should can compare a variable
+      }
     }
   """
 
@@ -24,6 +28,10 @@ defmodule MacroCompiler.Test.E2e.IfBlock do
 
   test_output :string, "should can use a variable", fn value ->
     value == "should can use a variable"
+  end
+
+  test_output :string, "should can compare a variable", fn value ->
+    value == "should can compare a variable"
   end
 end
 

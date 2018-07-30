@@ -16,12 +16,12 @@ defmodule MacroCompiler.Parser.Condition do
 
       skip(spaces()),
       choice([
-        string(">"),
         string(">="),
-        string("="),
+        string(">"),
         string("=="),
-        string("<"),
+        string("="),
         string("<="),
+        string("<"),
         string("!=")
       ]),
       skip(spaces()),
