@@ -1,11 +1,11 @@
 defmodule MacroCompiler.SemanticAnalysis.Validates.Variables do
   alias MacroCompiler.SemanticAnalysis.SymbolsTable
 
-  def validate_variables(%{macros: symbols_table_macros, special_variables: special_variables}) do
+  def validate_variables(%{macros: symbols_table_macros}) do
     variables_read =
       symbols_table_macros
       |> SymbolsTable.list_read_variables
-      |> Enum.reject(fn {name , _} -> Enum.member?(special_variables, name) end)
+      |> SymbolsTable.reject_special_variable
 
     variables_read_names =
       variables_read
@@ -15,6 +15,7 @@ defmodule MacroCompiler.SemanticAnalysis.Validates.Variables do
     variables_write =
       symbols_table_macros
       |> SymbolsTable.list_written_variables
+      |> SymbolsTable.reject_special_variable
 
     variables_write_names =
       variables_write

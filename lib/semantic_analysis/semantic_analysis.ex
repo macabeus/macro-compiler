@@ -30,6 +30,7 @@ defmodule MacroCompiler.SemanticAnalysis do
 
   import MacroCompiler.SemanticAnalysis.Validates.Variables
   import MacroCompiler.SemanticAnalysis.Validates.Macros
+  import MacroCompiler.SemanticAnalysis.Validates.SpecialVariables
 
   def build_symbols_table(ast) do
     symbols_table =
@@ -42,7 +43,8 @@ defmodule MacroCompiler.SemanticAnalysis do
   def run_validates(symbols_table) do
     List.flatten([
       validate_variables(symbols_table),
-      validate_macros(symbols_table)
+      validate_macros(symbols_table),
+      validate_special_variables(symbols_table)
     ])
   end
 
