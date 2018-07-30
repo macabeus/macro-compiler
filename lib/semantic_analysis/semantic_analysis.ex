@@ -25,6 +25,7 @@ defmodule MacroCompiler.SemanticAnalysis do
   alias MacroCompiler.Parser.PostfixIf
   alias MacroCompiler.Parser.Condition
   alias MacroCompiler.Parser.IfBlock
+  alias MacroCompiler.Parser.SingleCheck
 
   alias MacroCompiler.SemanticAnalysis.LatestVariableWrites
   alias MacroCompiler.SemanticAnalysis.SymbolsTable
@@ -265,6 +266,12 @@ defmodule MacroCompiler.SemanticAnalysis do
         variable_read: symbols_table(&1)
       }
     ))
+  end
+
+  defp symbols_table({%SingleCheck{scalar_variable: scalar_variable}, _metadata}) do
+    [
+      %{variable_read: symbols_table(scalar_variable)}
+    ]
   end
 
   defp symbols_table(_undefinedNode) do
