@@ -15,8 +15,6 @@ You may use EventMacro to configure the bot to complete quests or to buy itens, 
 
 >Hey! Warning: This project is under construction, thus it is incomplete and currently only has a tiny subset of EventMacro commands.
 
->You may follow the MacroCompiler development [on this post](http://openkorebrasil.org/index.php?/topic/4457-projeto-macro-compiler-compilador-do-eventmacro/) (in Portuguese)
-
 # Example
 
 The macro
@@ -70,7 +68,19 @@ mix test
 
 # How does it work?
 
-Since this is a project for studying purposes, I will explain how I created it, including its logic and design.
+Since this is a project for studying purposes, I will explain how I created it, including its logic and design. Also, you can see [this asciinema](https://asciinema.org/a/199032) about how to add a new command at the compiler, step by step - this video has just 4 minutes!
+
+## Talks
+
+As a part of my study, I presented some talks about compilers and I used this project as a study case.
+
+- Talk in English at The Conf 2018 🇬🇧 [Slides](https://speakerdeck.com/macabeus/demystifying-compilers-by-writing-your-own)
+
+<a href="https://www.youtube.com/watch?v=zMJYoYwOCd4"><img src="https://img.youtube.com/vi/zMJYoYwOCd4/hqdefault.jpg" /></a>
+
+- Talk in Portuguese at Pagar.me 🇧🇷 [Slides Part 1](https://speakerdeck.com/macabeus/aprendendo-compiladores-fazendo-um-parte-1) and [Slides Part 2](https://speakerdeck.com/macabeus/aprendendo-compiladores-fazendo-um-parte-2)
+
+<a href="https://www.youtube.com/watch?v=t77ThZNCJGY"><img src="http://img.youtube.com/vi/t77ThZNCJGY/0.jpg" /></a>
 
 ## Language design
 
